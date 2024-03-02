@@ -1,0 +1,303 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup1').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Set variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat('select * from ',\r\nitem().SCHEMA,\r\n'.',\r\nitem().TABLENAME)",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "AzureSqlTable1",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "PRQT_INGEST",
+									"type": "DatasetReference",
+									"parameters": {
+										"P_PATH": {
+											"value": "@item().PATH",
+											"type": "Expression"
+										},
+										"P_DATE": {
+											"value": "@variables('DATE')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "DATE",
+								"value": {
+									"value": "@concat(formatDateTime(utcnow(),'yyyy'),\n'/',\nformatDateTime(utcnow(),'MM'),\n'/',\nformatDateTime(utcnow(),'dd')\n)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Stored procedure1",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[PROC_INSERT_LOGS]",
+								"storedProcedureParameters": {
+									"P_COPYDURATION_SEG": {
+										"value": {
+											"value": "@activity('Copy data1').output.copyDuration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"P_DATAREAD_KB": {
+										"value": {
+											"value": "@activity('Copy data1').output.dataRead",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"P_DATAWRITTEN_KB": {
+										"value": {
+											"value": "@activity('Copy data1').output.dataWritten",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"P_DURATION_ACT_SEG": {
+										"value": {
+											"value": "@activity('Copy data1').output.executionDetails[0].duration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"P_PIPELINE_ID": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_ROWSCOPIED_UNIT": {
+										"value": {
+											"value": "@activity('Copy data1').output.rowsCopied",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"P_ROWSREAD_UNIT": {
+										"value": {
+											"value": "@activity('Copy data1').output.rowsRead",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"P_SCHEMA_NAME": {
+										"value": {
+											"value": "@item().SCHEMA",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_SERVER_NAME": {
+										"value": {
+											"value": "@item().SERVER",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_START_TIME": {
+										"value": {
+											"value": "@activity('Copy data1').output.executionDetails[0].start",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_STATUS": {
+										"value": {
+											"value": "@activity('Copy data1').output.executionDetails[0].status",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_TABLENAME": {
+										"value": {
+											"value": "@item().TABLENAME\r\n",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"P_THROUGHTPUT_MB": {
+										"value": {
+											"value": "@activity('Copy data1').output.throughput",
+											"type": "Expression"
+										},
+										"type": "Double"
+									},
+									"P_TRIGGER_TIME": {
+										"value": {
+											"value": "@pipeline().TriggerTime",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase2",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"variables": {
+			"DATE": {
+				"type": "String"
+			},
+			"V_DATAREADER": {
+				"type": "Integer"
+			},
+			"V_COPYDURATION": {
+				"type": "Integer"
+			},
+			"V_TABLENAME": {
+				"type": "String"
+			},
+			"throughput": {
+				"type": "Integer"
+			},
+			"V_ROWSREAD": {
+				"type": "Integer"
+			},
+			"DATAWRITTEN": {
+				"type": "Integer"
+			},
+			"V_START_TIME": {
+				"type": "String"
+			},
+			"V_STATUS": {
+				"type": "String"
+			},
+			"V_ROWCOPIED": {
+				"type": "Integer"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-12-14T02:28:36Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,95 @@
+{
+	"name": "PL_COPY_DATA_MSSQL",
+	"properties": {
+		"activities": [
+			{
+				"name": "CP_MSSQL",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('SELECT ',\n    pipeline().parameters.P_SELECT_COLUMN,\n    ' FROM ',\n    pipeline().parameters.P_SYSTEM,\n    '.',\n    pipeline().parameters.P_SCHEMA,\n    '.',\n    pipeline().parameters.P_TABLENAME,\n    ' WHERE ',\n    pipeline().parameters.P_WATERMARK_COLUMN,\n    ' > ',\n    '''',\n    pipeline().parameters.P_WATERMARK,\n    ''''\n)\n",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "ParquetWriteSettings"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DT_SRC_MSSQL",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DT_PRQ_DYN",
+						"type": "DatasetReference",
+						"parameters": {
+							"P_PATH": {
+								"value": "@pipeline().parameters.P_SYSTEM",
+								"type": "Expression"
+							},
+							"P_CONTAINER": "landingzone",
+							"P_TABLENAME": {
+								"value": "@pipeline().parameters.P_TABLENAME",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"P_SYSTEM": {
+				"type": "string"
+			},
+			"P_SCHEMA": {
+				"type": "string"
+			},
+			"P_TABLENAME": {
+				"type": "string"
+			},
+			"P_WATERMARK": {
+				"type": "string"
+			},
+			"P_SELECT_COLUMN": {
+				"type": "string"
+			},
+			"P_WATERMARK_COLUMN": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-03-02T02:38:02Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

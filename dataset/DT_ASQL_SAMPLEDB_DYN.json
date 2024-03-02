@@ -1,0 +1,13 @@
+{
+	"name": "DT_ASQL_SAMPLEDB_DYN",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ASQL_SAMPLEDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

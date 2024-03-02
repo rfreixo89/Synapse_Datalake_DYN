@@ -1,0 +1,32 @@
+{
+	"name": "PRQT_INGEST",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_DLS",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"P_PATH": {
+				"type": "string"
+			},
+			"P_DATE": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@concat(dataset().P_PATH,\n'/',\ndataset().P_DATE)",
+					"type": "Expression"
+				},
+				"fileSystem": "bronze"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

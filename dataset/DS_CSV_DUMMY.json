@@ -1,0 +1,25 @@
+{
+	"name": "DS_CSV_DUMMY",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_DLS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "dumy_csv.csv",
+				"folderPath": "dummy_files",
+				"fileSystem": "configfiles"
+			},
+			"columnDelimiter": ";",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

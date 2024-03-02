@@ -1,0 +1,77 @@
+{
+	"name": "DT_SRC_MSSQL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TECH",
+				"type": "varchar"
+			},
+			{
+				"name": "SERVER",
+				"type": "varchar"
+			},
+			{
+				"name": "SYSTEM",
+				"type": "varchar"
+			},
+			{
+				"name": "SCHEMA",
+				"type": "varchar"
+			},
+			{
+				"name": "TABLENAME",
+				"type": "varchar"
+			},
+			{
+				"name": "LOAD_TYPE",
+				"type": "varchar"
+			},
+			{
+				"name": "WATERMARK",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CHK_BIG_NUMBER",
+				"type": "varchar"
+			},
+			{
+				"name": "ACTIVE",
+				"type": "varchar"
+			},
+			{
+				"name": "SENSITIVE_DATA",
+				"type": "varchar"
+			},
+			{
+				"name": "SELECT_COLUMN",
+				"type": "varchar"
+			},
+			{
+				"name": "SELECT_COLUMN_MAX",
+				"type": "varchar"
+			},
+			{
+				"name": "PATH",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "CONTROL_TABLE"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

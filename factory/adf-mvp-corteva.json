@@ -1,0 +1,9 @@
+{
+	"name": "adf-mvp-corteva",
+	"location": "brazilsouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "5d5d6050-c849-4dc2-b212-636e72618056",
+		"tenantId": "3885f7a9-7c44-46cd-a0d1-8e8440220241"
+	}
+}
