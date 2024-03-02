@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Switch1",
+				"name": "Conditional Load Type",
 				"type": "Switch",
 				"dependsOn": [],
 				"userProperties": [],
