@@ -19,7 +19,20 @@
 								{
 									"name": "CP_MSSQL_INCREMENTAL",
 									"type": "Copy",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "V_FILENAME_MSSQL_INCR",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "V_PATH_MSSQL_INCR",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -69,21 +82,51 @@
 											"type": "DatasetReference",
 											"parameters": {
 												"P_PATH": {
-													"value": "@pipeline().parameters.P_PATH",
+													"value": "@variables('V_PATH')",
 													"type": "Expression"
 												},
 												"P_CONTAINER": "landingzone",
-												"P_TABLENAME": {
-													"value": "@pipeline().parameters.P_TABLENAME",
-													"type": "Expression"
-												},
-												"P_LOAD_TYPE": {
-													"value": "@pipeline().parameters.P_LOAD_TYPE",
+												"P_FILENAME": {
+													"value": "@variables('V_FILENAME')",
 													"type": "Expression"
 												}
 											}
 										}
 									]
+								},
+								{
+									"name": "V_FILENAME_MSSQL_INCR",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_FILENAME",
+										"value": {
+											"value": "@concat(toLower(pipeline().parameters.P_TABLENAME),\n'_',\npipeline().parameters.P_LOAD_TYPE,\n'_', \n    formatDateTime(utcnow(),'yyyyMMddTHHmmss'), \n    '.parquet')",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "V_PATH_MSSQL_INCR",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_PATH",
+										"value": {
+											"value": "@concat(\n    toUpper(pipeline().parameters.P_PATH), \n    '/',\n    formatDateTime(utcNow(),'yyyy'), \n    '/', \n    formatDateTime(utcNow(),'MM'), \n    '/', \n    formatDateTime(utcNow(),'dd')    \n  \n)",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
@@ -92,7 +135,20 @@
 						{
 							"name": "CP_MSSQL_FULL",
 							"type": "Copy",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "V_FILENAME_MSSQL_FULL",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "V_PATH_MSSQL_FULL",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -146,17 +202,47 @@
 											"type": "Expression"
 										},
 										"P_CONTAINER": "landingzone",
-										"P_TABLENAME": {
+										"P_FILENAME": {
 											"value": "@pipeline().parameters.P_TABLENAME",
-											"type": "Expression"
-										},
-										"P_LOAD_TYPE": {
-											"value": "@pipeline().parameters.P_LOAD_TYPE",
 											"type": "Expression"
 										}
 									}
 								}
 							]
+						},
+						{
+							"name": "V_FILENAME_MSSQL_FULL",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_FILENAME",
+								"value": {
+									"value": "@concat(toLower(pipeline().parameters.P_TABLENAME),\n'_',\npipeline().parameters.P_LOAD_TYPE,\n'_', \n    formatDateTime(utcnow(),'yyyyMMddTHHmmss'), \n    '.parquet')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "V_PATH_MSSQL_FULL",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "V_PATH",
+								"value": {
+									"value": "@concat(\n    toUpper(pipeline().parameters.P_PATH), \n    '/',\n    formatDateTime(utcNow(),'yyyy'), \n    '/', \n    formatDateTime(utcNow(),'MM'), \n    '/', \n    formatDateTime(utcNow(),'dd')    \n  \n)",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -204,6 +290,14 @@
 			},
 			"P_WATERMARK_COLUMN": {
 				"type": "string"
+			}
+		},
+		"variables": {
+			"V_PATH": {
+				"type": "String"
+			},
+			"V_FILENAME": {
+				"type": "String"
 			}
 		},
 		"annotations": [],

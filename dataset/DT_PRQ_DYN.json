@@ -12,10 +12,7 @@
 			"P_CONTAINER": {
 				"type": "string"
 			},
-			"P_TABLENAME": {
-				"type": "string"
-			},
-			"P_LOAD_TYPE": {
+			"P_FILENAME": {
 				"type": "string"
 			}
 		},
@@ -25,7 +22,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@concat(toLower(dataset().P_TABLENAME),\n'_',\ndataset().P_LOAD_TYPE,\n'_', \n    formatDateTime(utcnow(),'yyyyMMddTHHmmss'), \n    '.parquet')",
+					"value": "@dataset().P_FILENAME",
 					"type": "Expression"
 				},
 				"folderPath": {

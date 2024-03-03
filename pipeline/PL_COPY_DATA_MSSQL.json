@@ -59,7 +59,7 @@
 								"type": "Expression"
 							},
 							"P_CONTAINER": "landingzone",
-							"P_TABLENAME": {
+							"P_FILENAME": {
 								"value": "@pipeline().parameters.P_TABLENAME",
 								"type": "Expression"
 							},
