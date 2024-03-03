@@ -260,6 +260,9 @@
 					},
 					"P_TABLENAME": {
 						"type": "string"
+					},
+					"P_LOAD_TYPE": {
+						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -268,7 +271,7 @@
 					"location": {
 						"type": "AzureBlobFSLocation",
 						"fileName": {
-							"value": "@concat(toLower(dataset().P_TABLENAME),\n'_', \n    formatDateTime(utcnow(),'yyyyMMddTHHmmss'), \n    '.parquet')",
+							"value": "@concat(toLower(dataset().P_TABLENAME),\n'_',\ndataset().P_LOAD_TYPE,\n'_', \n    formatDateTime(utcnow(),'yyyyMMddTHHmmss'), \n    '.parquet')",
 							"type": "Expression"
 						},
 						"folderPath": {
@@ -472,6 +475,10 @@
 									"P_TABLENAME": {
 										"value": "@pipeline().parameters.P_TABLENAME",
 										"type": "Expression"
+									},
+									"P_LOAD_TYPE": {
+										"value": "@pipeline().parameters.P_LOAD_TYPE",
+										"type": "Expression"
 									}
 								}
 							}
@@ -498,6 +505,9 @@
 						"type": "string"
 					},
 					"P_WATERMARK_COLUMN": {
+						"type": "string"
+					},
+					"P_LOAD_TYPE": {
 						"type": "string"
 					}
 				},
@@ -590,6 +600,10 @@
 														"P_TABLENAME": {
 															"value": "@pipeline().parameters.P_TABLENAME",
 															"type": "Expression"
+														},
+														"P_LOAD_TYPE": {
+															"value": "@pipeline().parameters.P_LOAD_TYPE",
+															"type": "Expression"
 														}
 													}
 												}
@@ -659,6 +673,10 @@
 												"P_CONTAINER": "landingzone",
 												"P_TABLENAME": {
 													"value": "@pipeline().parameters.P_TABLENAME",
+													"type": "Expression"
+												},
+												"P_LOAD_TYPE": {
+													"value": "@pipeline().parameters.P_LOAD_TYPE",
 													"type": "Expression"
 												}
 											}
