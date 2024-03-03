@@ -143,1004 +143,222 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PL_END_DATE')]",
+			"name": "[concat(parameters('factoryName'), '/PL_SRC_STG_INCR')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "UPDATE_END_DATE",
-						"type": "Copy",
+						"name": "Conditional Load Type",
+						"type": "Switch",
 						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"additionalColumns": [
-									{
-										"name": "ROWKEY",
-										"value": {
-											"value": "@pipeline().parameters.P_ROWKEY",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SYSTEM",
-										"value": {
-											"value": "@pipeline().parameters.P_SYSTEM",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "TECH",
-										"value": {
-											"value": "@pipeline().parameters.P_TECH",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "INSTANCE",
-										"value": {
-											"value": "@pipeline().parameters.P_INSTANCE",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SCHEMA",
-										"value": {
-											"value": "@pipeline().parameters.P_SCHEMA",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "TABLE",
-										"value": {
-											"value": "@pipeline().parameters.P_TABLE",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SELECT_COL",
-										"value": {
-											"value": "@pipeline().parameters.P_SELECT_COL",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SOURC_CONTAINER",
-										"value": {
-											"value": "@pipeline().parameters.P_SOURC_CONTAINER",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "DEST_CONTAINER",
-										"value": {
-											"value": "@pipeline().parameters.P_DEST_CONTAINER",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "STORAGE_NAME",
-										"value": {
-											"value": "@pipeline().parameters.P_STORAGE_NAME",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "COMPANY_NAME",
-										"value": {
-											"value": "@pipeline().parameters.P_COMPANY_NAME",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "DB_DEST",
-										"value": {
-											"value": "@pipeline().parameters.P_DB_DEST",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "TURN_ON_OFF",
-										"value": {
-											"value": "@pipeline().parameters.P_TURN_ON_OFF",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "END_DATE",
-										"value": {
-											"value": "@utcnow()",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "CDC",
-										"value": {
-											"value": "@pipeline().parameters.P_CDC",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "CDC_COL",
-										"value": {
-											"value": "@pipeline().parameters.P_CDC_COL",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "WATERMARK_DATE",
-										"value": {
-											"value": "@pipeline().parameters.P_WATERMARK_DATE\n ",
-											"type": "Expression"
-										}
-									}
-								],
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
+							"on": {
+								"value": "@pipeline().parameters.P_LOAD_TYPE",
+								"type": "Expression"
 							},
-							"sink": {
-								"type": "AzureTableSink",
-								"azureTableInsertType": "merge",
-								"azureTableRowKeyName": "RowKey",
-								"writeBatchSize": 10000
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "ROWKEY",
-											"type": "String"
-										},
-										"sink": {
-											"name": "RowKey",
-											"type": "String"
+							"cases": [
+								{
+									"value": "I",
+									"activities": [
+										{
+											"name": "CP_MSSQL_INCREMENTAL",
+											"type": "Copy",
+											"dependsOn": [],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"source": {
+													"type": "AzureSqlSource",
+													"sqlReaderQuery": {
+														"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ' FROM [',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    '] WHERE ',\n    pipeline().parameters.P_WATERMARK_COLUMN,\n    ' > ',\n    '''',\n    pipeline().parameters.P_WATERMARK,\n    ''''\n)\n",
+														"type": "Expression"
+													},
+													"queryTimeout": "02:00:00",
+													"partitionOption": "None"
+												},
+												"sink": {
+													"type": "ParquetSink",
+													"storeSettings": {
+														"type": "AzureBlobFSWriteSettings"
+													},
+													"formatSettings": {
+														"type": "ParquetWriteSettings"
+													}
+												},
+												"enableStaging": false,
+												"translator": {
+													"type": "TabularTranslator",
+													"typeConversion": true,
+													"typeConversionSettings": {
+														"allowDataTruncation": true,
+														"treatBooleanAsNumber": false
+													}
+												}
+											},
+											"inputs": [
+												{
+													"referenceName": "DT_SRC_MSSQL",
+													"type": "DatasetReference",
+													"parameters": {}
+												}
+											],
+											"outputs": [
+												{
+													"referenceName": "DT_PRQ_DYN",
+													"type": "DatasetReference",
+													"parameters": {
+														"P_PATH": {
+															"value": "@pipeline().parameters.P_PATH",
+															"type": "Expression"
+														},
+														"P_CONTAINER": "landingzone",
+														"P_TABLENAME": {
+															"value": "@pipeline().parameters.P_TABLENAME",
+															"type": "Expression"
+														}
+													}
+												}
+											]
 										}
-									},
-									{
-										"source": {
-											"name": "CDC",
-											"type": "String"
-										},
-										"sink": {
-											"name": "CDC",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "CDC_COL",
-											"type": "String"
-										},
-										"sink": {
-											"name": "CDC_COL",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "COMPANY_NAME",
-											"type": "String"
-										},
-										"sink": {
-											"name": "COMPANY_NAME",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "DB_DEST",
-											"type": "String"
-										},
-										"sink": {
-											"name": "DB_DEST",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "DEST_CONTAINER",
-											"type": "String"
-										},
-										"sink": {
-											"name": "DEST_CONTAINER",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "END_DATE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "END_DATE",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "INSTANCE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "INSTANCE",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SCHEMA",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SCHEMA",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SELECT_COL",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SELECT_COL",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SOURC_CONTAINER",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SOURC_CONTAINER",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "STORAGE_NAME",
-											"type": "String"
-										},
-										"sink": {
-											"name": "STORAGE_NAME",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SYSTEM",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SYSTEM",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "TABLE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "TABLE",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "TECH",
-											"type": "String"
-										},
-										"sink": {
-											"name": "TECH",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "TURN_ON_OFF",
-											"type": "String"
-										},
-										"sink": {
-											"name": "TURN_ON_OFF",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "WATERMARK_DATE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "WATERMARK_DATE",
-											"type": "DateTimeOffset"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
+									]
 								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DS_CSV_DUMMY",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DT_ASTB_CONTROL",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
+							],
+							"defaultActivities": [
+								{
+									"name": "CP_MSSQL_FULL",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@concat('SELECT ',\n    pipeline().parameters.P_SELECT_COLUMN,\n    ' FROM ',\n    pipeline().parameters.P_SYSTEM,\n    '.',\n    pipeline().parameters.P_SCHEMA,\n    '.',\n    pipeline().parameters.P_TABLENAME\n   \n)\n",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DT_SRC_MSSQL",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DT_PRQ_DYN",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@pipeline().parameters.P_PATH",
+													"type": "Expression"
+												},
+												"P_CONTAINER": "landingzone",
+												"P_TABLENAME": {
+													"value": "@pipeline().parameters.P_TABLENAME",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
 				"parameters": {
-					"P_ROWKEY": {
-						"type": "string"
-					},
-					"P_SYSTEM": {
-						"type": "string"
-					},
 					"P_TECH": {
 						"type": "string"
 					},
-					"P_INSTANCE": {
-						"type": "string"
-					},
-					"P_SCHEMA": {
-						"type": "string"
-					},
-					"P_TABLE": {
-						"type": "string"
-					},
-					"P_SELECT_COL": {
-						"type": "string"
-					},
-					"P_SOURC_CONTAINER": {
-						"type": "string"
-					},
-					"P_DEST_CONTAINER": {
-						"type": "string"
-					},
-					"P_STORAGE_NAME": {
-						"type": "string"
-					},
-					"P_COMPANY_NAME": {
-						"type": "string"
-					},
-					"P_DB_DEST": {
-						"type": "string"
-					},
-					"P_TURN_ON_OFF": {
-						"type": "string"
-					},
-					"P_START_DATE": {
-						"type": "string"
-					},
-					"P_END_DATE": {
-						"type": "string"
-					},
-					"P_CDC": {
-						"type": "string"
-					},
-					"P_CDC_COL": {
-						"type": "string"
-					},
-					"P_WATERMARK_DATE": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "SqlServer/01_OP_TO_LDZ"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-07-25T21:31:03Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_CSV_DUMMY')]",
-				"[concat(variables('factoryId'), '/datasets/DT_ASTB_CONTROL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_LOG_INGEST')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"additionalColumns": [
-									{
-										"name": "TABLE",
-										"value": {
-											"value": "@pipeline().parameters.P_TABLE",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SCHEMA",
-										"value": {
-											"value": "@pipeline().parameters.P_SCHEMA",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SYSTEM",
-										"value": {
-											"value": "@pipeline().parameters.P_SYSTEM",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "STORAGE",
-										"value": {
-											"value": "@pipeline().parameters.P_STORAGE",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "COMPANY",
-										"value": {
-											"value": "@pipeline().parameters.P_COMPANY",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "ROWREAD",
-										"value": {
-											"value": "@variables('V_ROWREAD')",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "ROWWRITE",
-										"value": ""
-									},
-									{
-										"name": "DATAREAD",
-										"value": "$$FILEPATH"
-									},
-									{
-										"name": "DATAWRITE",
-										"value": "$$FILEPATH"
-									},
-									{
-										"name": "THROUGHPUT",
-										"value": "$$FILEPATH"
-									},
-									{
-										"name": "COPYDURATION",
-										"value": "$$FILEPATH"
-									},
-									{
-										"name": "ERROR",
-										"value": "$$FILEPATH"
-									},
-									{
-										"name": "DATE",
-										"value": "$$FILEPATH"
-									}
-								],
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureTableSink",
-								"azureTableInsertType": "merge",
-								"writeBatchSize": 10000
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DS_CSV_DUMMY",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DT_ASTB_INGEST_LOG",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"P_TABLE": {
-						"type": "string"
-					},
-					"P_SCHEMA": {
+					"P_SERVER": {
 						"type": "string"
 					},
 					"P_SYSTEM": {
 						"type": "string"
 					},
-					"P_STORAGE": {
-						"type": "string"
-					},
-					"P_COMPANY": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"V_ROWREAD": {
-						"type": "String"
-					},
-					"V_ROWWRITE": {
-						"type": "String"
-					},
-					"V_DATAREAD": {
-						"type": "String"
-					},
-					"V_DATAWRITE": {
-						"type": "String"
-					},
-					"V_THROUGHPUT": {
-						"type": "String"
-					},
-					"V_COPYDURATION": {
-						"type": "String"
-					},
-					"V_ERROR": {
-						"type": "String"
-					},
-					"V_DATE": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "SqlServer/01_OP_TO_LDZ"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-07-18T22:25:58Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_CSV_DUMMY')]",
-				"[concat(variables('factoryId'), '/datasets/DT_ASTB_INGEST_LOG')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_OP_TO_LDZ_copy2')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "UPDATE_START_DATE",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"additionalColumns": [
-									{
-										"name": "ROWKEY",
-										"value": {
-											"value": "@pipeline().parameters.P_ROWKEY",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SYSTEM",
-										"value": {
-											"value": "@pipeline().parameters.P_SYSTEM",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "TECH",
-										"value": {
-											"value": "@pipeline().parameters.P_TECH",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "INSTANCE",
-										"value": {
-											"value": "@pipeline().parameters.P_INSTANCE",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SCHEMA",
-										"value": {
-											"value": "@pipeline().parameters.P_SCHEMA",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "TABLE",
-										"value": {
-											"value": "@pipeline().parameters.P_TABLE",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SELECT_COL",
-										"value": {
-											"value": "@pipeline().parameters.P_SELECT_COL",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SOURC_CONTAINER",
-										"value": {
-											"value": "@pipeline().parameters.P_SOURC_CONTAINER",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "DEST_CONTAINER",
-										"value": {
-											"value": "@pipeline().parameters.P_DEST_CONTAINER",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "STORAGE_NAME",
-										"value": {
-											"value": "@pipeline().parameters.P_STORAGE_NAME",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "COMPANY_NAME",
-										"value": {
-											"value": "@pipeline().parameters.P_COMPANY_NAME",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "DB_DEST",
-										"value": {
-											"value": "@pipeline().parameters.P_DB_DEST",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "TURN_ON_OFF",
-										"value": {
-											"value": "@pipeline().parameters.P_TURN_ON_OFF",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "START_DATE",
-										"value": {
-											"value": "@pipeline().TriggerTime",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "END_DATE",
-										"value": {
-											"value": "@pipeline().parameters.P_END_DATE",
-											"type": "Expression"
-										}
-									}
-								],
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureTableSink",
-								"azureTableInsertType": "replace",
-								"azureTableRowKeyName": "RowKey",
-								"writeBatchSize": 10000
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "ROWKEY",
-											"type": "String"
-										},
-										"sink": {
-											"name": "RowKey",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SYSTEM",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SYSTEM",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "TECH",
-											"type": "String"
-										},
-										"sink": {
-											"name": "TECH",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "INSTANCE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "INSTANCE",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SCHEMA",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SCHEMA",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "TABLE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "TABLE",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SELECT_COL",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SELECT_COL",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SOURC_CONTAINER",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SOURC_CONTAINER",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "DEST_CONTAINER",
-											"type": "String"
-										},
-										"sink": {
-											"name": "DEST_CONTAINER",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "STORAGE_NAME",
-											"type": "String"
-										},
-										"sink": {
-											"name": "STORAGE_NAME",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "COMPANY_NAME",
-											"type": "String"
-										},
-										"sink": {
-											"name": "COMPANY_NAME",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "DB_DEST",
-											"type": "String"
-										},
-										"sink": {
-											"name": "DB_DEST",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "TURN_ON_OFF",
-											"type": "String"
-										},
-										"sink": {
-											"name": "TURN_ON_OFF",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "END_DATE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "END_DATE",
-											"type": "DateTimeOffset"
-										}
-									},
-									{
-										"source": {
-											"name": "START_DATE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "START_DATE",
-											"type": "DateTimeOffset"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DS_CSV_DUMMY",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DT_ASTB_CONTROL",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"P_ROWKEY": {
-						"type": "string"
-					},
-					"P_SYSTEM": {
-						"type": "string"
-					},
-					"P_TECH": {
-						"type": "string"
-					},
-					"P_INSTANCE": {
-						"type": "string"
-					},
 					"P_SCHEMA": {
 						"type": "string"
 					},
-					"P_TABLE": {
+					"P_TABLENAME": {
 						"type": "string"
 					},
-					"P_SELECT_COL": {
+					"P_LOAD_TYPE": {
 						"type": "string"
 					},
-					"P_SOURC_CONTAINER": {
+					"P_WATERMARK": {
 						"type": "string"
 					},
-					"P_DEST_CONTAINER": {
+					"P_CHK_BIG_NUMBER": {
 						"type": "string"
 					},
-					"P_STORAGE_NAME": {
+					"P_ACTIVE": {
 						"type": "string"
 					},
-					"P_COMPANY_NAME": {
+					"P_SENSITIVE_DATA": {
 						"type": "string"
 					},
-					"P_DB_DEST": {
+					"P_SELECT_COLUMN": {
 						"type": "string"
 					},
-					"P_TURN_ON_OFF": {
+					"P_SELECT_COLUMN_MAX": {
 						"type": "string"
 					},
-					"P_START_DATE": {
+					"P_PATH": {
 						"type": "string"
 					},
-					"P_END_DATE": {
+					"P_WATERMARK_COLUMN": {
 						"type": "string"
 					}
 				},
-				"folder": {
-					"name": "SqlServer/01_OP_TO_LDZ"
-				},
 				"annotations": [],
-				"lastPublishTime": "2023-07-18T20:50:48Z"
+				"lastPublishTime": "2024-03-02T02:42:13Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_CSV_DUMMY')]",
-				"[concat(variables('factoryId'), '/datasets/DT_ASTB_CONTROL')]"
+				"[concat(variables('factoryId'), '/datasets/DT_SRC_MSSQL')]",
+				"[concat(variables('factoryId'), '/datasets/DT_PRQ_DYN')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PL_PROCESS_INGEST')]",
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1399,942 +617,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PL_SRC_STG_INCR')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Conditional Load Type",
-						"type": "Switch",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"on": {
-								"value": "@pipeline().parameters.P_LOAD_TYPE",
-								"type": "Expression"
-							},
-							"cases": [
-								{
-									"value": "I",
-									"activities": [
-										{
-											"name": "CP_MSSQL_INCREMENTAL",
-											"type": "Copy",
-											"dependsOn": [],
-											"policy": {
-												"timeout": "0.12:00:00",
-												"retry": 0,
-												"retryIntervalInSeconds": 30,
-												"secureOutput": false,
-												"secureInput": false
-											},
-											"userProperties": [],
-											"typeProperties": {
-												"source": {
-													"type": "AzureSqlSource",
-													"sqlReaderQuery": {
-														"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ' FROM [',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    '] WHERE ',\n    pipeline().parameters.P_WATERMARK_COLUMN,\n    ' > ',\n    '''',\n    pipeline().parameters.P_WATERMARK,\n    ''''\n)\n",
-														"type": "Expression"
-													},
-													"queryTimeout": "02:00:00",
-													"partitionOption": "None"
-												},
-												"sink": {
-													"type": "ParquetSink",
-													"storeSettings": {
-														"type": "AzureBlobFSWriteSettings"
-													},
-													"formatSettings": {
-														"type": "ParquetWriteSettings"
-													}
-												},
-												"enableStaging": false,
-												"translator": {
-													"type": "TabularTranslator",
-													"typeConversion": true,
-													"typeConversionSettings": {
-														"allowDataTruncation": true,
-														"treatBooleanAsNumber": false
-													}
-												}
-											},
-											"inputs": [
-												{
-													"referenceName": "DT_SRC_MSSQL",
-													"type": "DatasetReference",
-													"parameters": {}
-												}
-											],
-											"outputs": [
-												{
-													"referenceName": "DT_PRQ_DYN",
-													"type": "DatasetReference",
-													"parameters": {
-														"P_PATH": {
-															"value": "@pipeline().parameters.P_PATH",
-															"type": "Expression"
-														},
-														"P_CONTAINER": "landingzone",
-														"P_TABLENAME": {
-															"value": "@pipeline().parameters.P_TABLENAME",
-															"type": "Expression"
-														}
-													}
-												}
-											]
-										}
-									]
-								}
-							],
-							"defaultActivities": [
-								{
-									"name": "CP_MSSQL_FULL",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "@concat('SELECT ',\n    pipeline().parameters.P_SELECT_COLUMN,\n    ' FROM ',\n    pipeline().parameters.P_SYSTEM,\n    '.',\n    pipeline().parameters.P_SCHEMA,\n    '.',\n    pipeline().parameters.P_TABLENAME\n   \n)\n",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "ParquetSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "ParquetWriteSettings"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "DT_SRC_MSSQL",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "DT_PRQ_DYN",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_PATH": {
-													"value": "@pipeline().parameters.P_PATH",
-													"type": "Expression"
-												},
-												"P_CONTAINER": "landingzone",
-												"P_TABLENAME": {
-													"value": "@pipeline().parameters.P_TABLENAME",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"P_TECH": {
-						"type": "string"
-					},
-					"P_SERVER": {
-						"type": "string"
-					},
-					"P_SYSTEM": {
-						"type": "string"
-					},
-					"P_SCHEMA": {
-						"type": "string"
-					},
-					"P_TABLENAME": {
-						"type": "string"
-					},
-					"P_LOAD_TYPE": {
-						"type": "string"
-					},
-					"P_WATERMARK": {
-						"type": "string"
-					},
-					"P_CHK_BIG_NUMBER": {
-						"type": "string"
-					},
-					"P_ACTIVE": {
-						"type": "string"
-					},
-					"P_SENSITIVE_DATA": {
-						"type": "string"
-					},
-					"P_SELECT_COLUMN": {
-						"type": "string"
-					},
-					"P_SELECT_COLUMN_MAX": {
-						"type": "string"
-					},
-					"P_PATH": {
-						"type": "string"
-					},
-					"P_WATERMARK_COLUMN": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-03-02T02:42:13Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DT_SRC_MSSQL')]",
-				"[concat(variables('factoryId'), '/datasets/DT_PRQ_DYN')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PL_START_DATE')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "UPDATE_START_DATE",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"additionalColumns": [
-									{
-										"name": "ROWKEY",
-										"value": {
-											"value": "@pipeline().parameters.P_ROWKEY",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SYSTEM",
-										"value": {
-											"value": "@pipeline().parameters.P_SYSTEM",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "TECH",
-										"value": {
-											"value": "@pipeline().parameters.P_TECH",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "INSTANCE",
-										"value": {
-											"value": "@pipeline().parameters.P_INSTANCE",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SCHEMA",
-										"value": {
-											"value": "@pipeline().parameters.P_SCHEMA",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "TABLE",
-										"value": {
-											"value": "@pipeline().parameters.P_TABLE",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SELECT_COL",
-										"value": {
-											"value": "@pipeline().parameters.P_SELECT_COL",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "SOURC_CONTAINER",
-										"value": {
-											"value": "@pipeline().parameters.P_SOURC_CONTAINER",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "DEST_CONTAINER",
-										"value": {
-											"value": "@pipeline().parameters.P_DEST_CONTAINER",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "STORAGE_NAME",
-										"value": {
-											"value": "@pipeline().parameters.P_STORAGE_NAME",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "COMPANY_NAME",
-										"value": {
-											"value": "@pipeline().parameters.P_COMPANY_NAME",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "DB_DEST",
-										"value": {
-											"value": "@pipeline().parameters.P_DB_DEST",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "TURN_ON_OFF",
-										"value": {
-											"value": "@pipeline().parameters.P_TURN_ON_OFF",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "START_DATE",
-										"value": {
-											"value": "@pipeline().TriggerTime",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "CDC",
-										"value": {
-											"value": "@pipeline().parameters.P_CDC",
-											"type": "Expression"
-										}
-									},
-									{
-										"name": "CDC_COL",
-										"value": {
-											"value": "@pipeline().parameters.P_CDC_COL",
-											"type": "Expression"
-										}
-									}
-								],
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureTableSink",
-								"azureTableInsertType": "merge",
-								"azureTableRowKeyName": "RowKey",
-								"writeBatchSize": 10000
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "ROWKEY",
-											"type": "String"
-										},
-										"sink": {
-											"name": "RowKey",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "CDC",
-											"type": "String"
-										},
-										"sink": {
-											"name": "CDC",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "CDC_COL",
-											"type": "String"
-										},
-										"sink": {
-											"name": "CDC_COL",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "COMPANY_NAME",
-											"type": "String"
-										},
-										"sink": {
-											"name": "COMPANY_NAME",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "DB_DEST",
-											"type": "String"
-										},
-										"sink": {
-											"name": "DB_DEST",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "DEST_CONTAINER",
-											"type": "String"
-										},
-										"sink": {
-											"name": "DEST_CONTAINER",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "INSTANCE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "INSTANCE",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SCHEMA",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SCHEMA",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SELECT_COL",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SELECT_COL",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SOURC_CONTAINER",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SOURC_CONTAINER",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "START_DATE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "START_DATE",
-											"type": "DateTimeOffset"
-										}
-									},
-									{
-										"source": {
-											"name": "STORAGE_NAME",
-											"type": "String"
-										},
-										"sink": {
-											"name": "STORAGE_NAME",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "SYSTEM",
-											"type": "String"
-										},
-										"sink": {
-											"name": "SYSTEM",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "TABLE",
-											"type": "String"
-										},
-										"sink": {
-											"name": "TABLE",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "TECH",
-											"type": "String"
-										},
-										"sink": {
-											"name": "TECH",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"name": "TURN_ON_OFF",
-											"type": "String"
-										},
-										"sink": {
-											"name": "TURN_ON_OFF",
-											"type": "String"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DS_CSV_DUMMY",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DT_ASTB_CONTROL",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"P_ROWKEY": {
-						"type": "string"
-					},
-					"P_SYSTEM": {
-						"type": "string"
-					},
-					"P_TECH": {
-						"type": "string"
-					},
-					"P_INSTANCE": {
-						"type": "string"
-					},
-					"P_SCHEMA": {
-						"type": "string"
-					},
-					"P_TABLE": {
-						"type": "string"
-					},
-					"P_SELECT_COL": {
-						"type": "string"
-					},
-					"P_SOURC_CONTAINER": {
-						"type": "string"
-					},
-					"P_DEST_CONTAINER": {
-						"type": "string"
-					},
-					"P_STORAGE_NAME": {
-						"type": "string"
-					},
-					"P_COMPANY_NAME": {
-						"type": "string"
-					},
-					"P_DB_DEST": {
-						"type": "string"
-					},
-					"P_TURN_ON_OFF": {
-						"type": "string"
-					},
-					"P_START_DATE": {
-						"type": "string"
-					},
-					"P_CDC": {
-						"type": "string"
-					},
-					"P_CDC_COL": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"APAGAR": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "SqlServer/01_OP_TO_LDZ"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-07-25T21:31:03Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_CSV_DUMMY')]",
-				"[concat(variables('factoryId'), '/datasets/DT_ASTB_CONTROL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Copy data1",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "Set variable1",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "@concat('select * from ',\r\nitem().SCHEMA,\r\n'.',\r\nitem().TABLENAME)",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "ParquetSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "ParquetWriteSettings"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "AzureSqlTable1",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "PRQT_INGEST",
-											"type": "DatasetReference",
-											"parameters": {
-												"P_PATH": {
-													"value": "@item().PATH",
-													"type": "Expression"
-												},
-												"P_DATE": {
-													"value": "@variables('DATE')",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Set variable1",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "DATE",
-										"value": {
-											"value": "@concat(formatDateTime(utcnow(),'yyyy'),\n'/',\nformatDateTime(utcnow(),'MM'),\n'/',\nformatDateTime(utcnow(),'dd')\n)",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Stored procedure1",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "Copy data1",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[PROC_INSERT_LOGS]",
-										"storedProcedureParameters": {
-											"P_COPYDURATION_SEG": {
-												"value": {
-													"value": "@activity('Copy data1').output.copyDuration",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"P_DATAREAD_KB": {
-												"value": {
-													"value": "@activity('Copy data1').output.dataRead",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"P_DATAWRITTEN_KB": {
-												"value": {
-													"value": "@activity('Copy data1').output.dataWritten",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"P_DURATION_ACT_SEG": {
-												"value": {
-													"value": "@activity('Copy data1').output.executionDetails[0].duration",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"P_PIPELINE_ID": {
-												"value": {
-													"value": "@pipeline().RunId",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"P_ROWSCOPIED_UNIT": {
-												"value": {
-													"value": "@activity('Copy data1').output.rowsCopied",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"P_ROWSREAD_UNIT": {
-												"value": {
-													"value": "@activity('Copy data1').output.rowsRead",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"P_SCHEMA_NAME": {
-												"value": {
-													"value": "@item().SCHEMA",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"P_SERVER_NAME": {
-												"value": {
-													"value": "@item().SERVER",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"P_START_TIME": {
-												"value": {
-													"value": "@activity('Copy data1').output.executionDetails[0].start",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"P_STATUS": {
-												"value": {
-													"value": "@activity('Copy data1').output.executionDetails[0].status",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"P_TABLENAME": {
-												"value": {
-													"value": "@item().TABLENAME\r\n",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"P_THROUGHTPUT_MB": {
-												"value": {
-													"value": "@activity('Copy data1').output.throughput",
-													"type": "Expression"
-												},
-												"type": "Double"
-											},
-											"P_TRIGGER_TIME": {
-												"value": {
-													"value": "@pipeline().TriggerTime",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "AzureSqlDatabase2",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "AzureSqlTable1",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"DATE": {
-						"type": "String"
-					},
-					"V_DATAREADER": {
-						"type": "Integer"
-					},
-					"V_COPYDURATION": {
-						"type": "Integer"
-					},
-					"V_TABLENAME": {
-						"type": "String"
-					},
-					"throughput": {
-						"type": "Integer"
-					},
-					"V_ROWSREAD": {
-						"type": "Integer"
-					},
-					"DATAWRITTEN": {
-						"type": "Integer"
-					},
-					"V_START_TIME": {
-						"type": "String"
-					},
-					"V_STATUS": {
-						"type": "String"
-					},
-					"V_ROWCOPIED": {
-						"type": "Integer"
-					}
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-12-14T02:28:36Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]",
-				"[concat(variables('factoryId'), '/datasets/PRQT_INGEST')]",
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase2')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2404,35 +686,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_CSV_DUMMY')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_DLS",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "dumy_csv.csv",
-						"folderPath": "dummy_files",
-						"fileSystem": "configfiles"
-					},
-					"columnDelimiter": ";",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_DLS')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/DT_ASQL_SAMPLEDB_DYN')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2448,46 +701,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_ASQL_SAMPLEDB')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DT_ASTB_CONTROL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_ASTB_CONTROL",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureTable",
-				"schema": [],
-				"typeProperties": {
-					"tableName": "TBControlTable"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_ASTB_CONTROL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DT_ASTB_INGEST_LOG')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_ASTB_CONTROL",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureTable",
-				"schema": [],
-				"typeProperties": {
-					"tableName": "TBIngestLogs"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_ASTB_CONTROL')]"
 			]
 		},
 		{
