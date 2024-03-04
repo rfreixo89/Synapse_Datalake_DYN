@@ -81,8 +81,14 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "dbo",
-			"table": "CONTROL_TABLE"
+			"schema": {
+				"value": "@dataset().P_SCHEMA",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().P_TABLENAME",
+				"type": "Expression"
+			}
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"

@@ -21,8 +21,12 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "AzureSqlTable1",
-						"type": "DatasetReference"
+						"referenceName": "DT_SRC_MSSQL",
+						"type": "DatasetReference",
+						"parameters": {
+							"P_TABLENAME": "CONTROL_TABLE",
+							"P_SCHEMA": "dbo"
+						}
 					},
 					"firstRowOnly": false
 				}
