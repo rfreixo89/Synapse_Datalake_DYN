@@ -1,0 +1,1192 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-event-trigger-dev"
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=mvpservcorteva.database.windows.net;Initial Catalog=MVPSQLCORTEVA"
+		},
+		"AzureSqlDatabase2_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase2'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=srv-event-triger-dev.database.windows.net;Initial Catalog=sql-serverless-corteva"
+		},
+		"LS_ASQL_SAMPLEDB_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_ASQL_SAMPLEDB'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sqlcortdev.database.windows.net;Initial Catalog=sampledb"
+		},
+		"LS_ASTB_CONTROL_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_ASTB_CONTROL'"
+		},
+		"LS_DLS_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_DLS'"
+		},
+		"AzureDatabricks1_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0304-000144-5r6215d2"
+		},
+		"LS_DLS_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://dlseventtriggerdev.dfs.core.windows.net/"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricks1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-126847443262264.4.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/2bfc44c5-aef6-403f-bd57-d339da205622/resourceGroups/DL-Event-Trigger-dev/providers/Microsoft.Databricks/workspaces/adb-event-trigger-dev",
+					"existingClusterId": "[parameters('AzureDatabricks1_properties_typeProperties_existingClusterId')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabase2_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_ASQL_SAMPLEDB')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_ASQL_SAMPLEDB_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_ASTB_CONTROL')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureTableStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_ASTB_CONTROL_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_DLS')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LS_DLS_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('LS_DLS_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TABLENAME",
+						"type": "varchar"
+					},
+					{
+						"name": "SYSTEM",
+						"type": "varchar"
+					},
+					{
+						"name": "SERVER",
+						"type": "varchar"
+					},
+					{
+						"name": "SCHEMA",
+						"type": "varchar"
+					},
+					{
+						"name": "LOAD_TYPE",
+						"type": "bit"
+					},
+					{
+						"name": "WATERMARK",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ACTIVE",
+						"type": "bit"
+					},
+					{
+						"name": "SENSITIVE_DATA",
+						"type": "bit"
+					},
+					{
+						"name": "PATH",
+						"type": "varchar"
+					},
+					{
+						"name": "FILTER_CONDITION",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "CONTROL_TABLE"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DT_ASQL_SAMPLEDB_DYN')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ASQL_SAMPLEDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ASQL_SAMPLEDB')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DT_PARQ_DYN')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DLS",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_CONTAINER": {
+						"type": "string"
+					},
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_YEAR": {
+						"type": "string"
+					},
+					"P_MONTH": {
+						"type": "string"
+					},
+					"P_DAY": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@concat(dataset().P_PATH,\n'/',\ndataset().P_YEAR,\n'/',\ndataset().P_MONTH,\n'/',\ndataset().P_DAY\n\n)\n\n\n\n    \n",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@toLower(dataset().P_CONTAINER)",
+							"type": "Expression"
+						}
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DLS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DT_PRQ_DYN')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DLS",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_CONTAINER": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().P_FILENAME",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().P_PATH\n",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().P_CONTAINER",
+							"type": "Expression"
+						}
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DLS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DT_SRC_MSSQL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_TABLENAME": {
+						"type": "string"
+					},
+					"P_SCHEMA": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TECH",
+						"type": "varchar"
+					},
+					{
+						"name": "SERVER",
+						"type": "varchar"
+					},
+					{
+						"name": "SYSTEM",
+						"type": "varchar"
+					},
+					{
+						"name": "SCHEMA",
+						"type": "varchar"
+					},
+					{
+						"name": "TABLENAME",
+						"type": "varchar"
+					},
+					{
+						"name": "LOAD_TYPE",
+						"type": "varchar"
+					},
+					{
+						"name": "WATERMARK",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CHK_BIG_NUMBER",
+						"type": "varchar"
+					},
+					{
+						"name": "ACTIVE",
+						"type": "varchar"
+					},
+					{
+						"name": "SENSITIVE_DATA",
+						"type": "varchar"
+					},
+					{
+						"name": "SELECT_COLUMN",
+						"type": "varchar"
+					},
+					{
+						"name": "SELECT_COLUMN_MAX",
+						"type": "varchar"
+					},
+					{
+						"name": "PATH",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "CONTROL_TABLE"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PRQT_INGEST')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_DLS",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_DATE": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@concat(dataset().P_PATH,\n'/',\ndataset().P_DATE)",
+							"type": "Expression"
+						},
+						"fileSystem": "bronze"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_DLS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_COPY_DATA_MSSQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "CP_MSSQL",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('SELECT ',\n    pipeline().parameters.P_SELECT_COLUMN,\n    ' FROM ',\n    pipeline().parameters.P_SYSTEM,\n    '.',\n    pipeline().parameters.P_SCHEMA,\n    '.',\n    pipeline().parameters.P_TABLENAME,\n    ' WHERE ',\n    pipeline().parameters.P_WATERMARK_COLUMN,\n    ' > ',\n    '''',\n    pipeline().parameters.P_WATERMARK,\n    ''''\n)\n",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DT_SRC_MSSQL",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_TABLENAME": {
+										"value": "@pipeline().parameters.P_TABLENAME",
+										"type": "Expression"
+									},
+									"P_SCHEMA": {
+										"value": "@pipeline().parameters.P_SCHEMA",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DT_PRQ_DYN",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_PATH": {
+										"value": "@pipeline().parameters.P_SYSTEM",
+										"type": "Expression"
+									},
+									"P_CONTAINER": "landingzone",
+									"P_FILENAME": {
+										"value": "@pipeline().parameters.P_TABLENAME",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"P_SYSTEM": {
+						"type": "string"
+					},
+					"P_SCHEMA": {
+						"type": "string"
+					},
+					"P_TABLENAME": {
+						"type": "string"
+					},
+					"P_WATERMARK": {
+						"type": "string"
+					},
+					"P_SELECT_COLUMN": {
+						"type": "string"
+					},
+					"P_WATERMARK_COLUMN": {
+						"type": "string"
+					},
+					"P_LOAD_TYPE": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-03-02T02:38:02Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DT_SRC_MSSQL')]",
+				"[concat(variables('factoryId'), '/datasets/DT_PRQ_DYN')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_SRC_STG_INCR')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Conditional Load Type",
+						"type": "Switch",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"on": {
+								"value": "@pipeline().parameters.P_LOAD_TYPE",
+								"type": "Expression"
+							},
+							"cases": [
+								{
+									"value": "I",
+									"activities": [
+										{
+											"name": "CP_MSSQL_INCREMENTAL",
+											"type": "Copy",
+											"dependsOn": [
+												{
+													"activity": "V_FILENAME_MSSQL_INCR",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												},
+												{
+													"activity": "V_PATH_MSSQL_INCR",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"source": {
+													"type": "AzureSqlSource",
+													"sqlReaderQuery": {
+														"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME FROM [',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    '] WHERE ',\n    pipeline().parameters.P_WATERMARK_COLUMN,\n    ' > ',\n    '''',\n    pipeline().parameters.P_WATERMARK,\n    ''''\n)\n",
+														"type": "Expression"
+													},
+													"queryTimeout": "02:00:00",
+													"partitionOption": "None"
+												},
+												"sink": {
+													"type": "ParquetSink",
+													"storeSettings": {
+														"type": "AzureBlobFSWriteSettings"
+													},
+													"formatSettings": {
+														"type": "ParquetWriteSettings"
+													}
+												},
+												"enableStaging": false,
+												"translator": {
+													"type": "TabularTranslator",
+													"typeConversion": true,
+													"typeConversionSettings": {
+														"allowDataTruncation": true,
+														"treatBooleanAsNumber": false
+													}
+												}
+											},
+											"inputs": [
+												{
+													"referenceName": "DT_SRC_MSSQL",
+													"type": "DatasetReference",
+													"parameters": {
+														"P_TABLENAME": {
+															"value": "@pipeline().parameters.P_TABLENAME",
+															"type": "Expression"
+														},
+														"P_SCHEMA": {
+															"value": "@pipeline().parameters.P_SCHEMA",
+															"type": "Expression"
+														}
+													}
+												}
+											],
+											"outputs": [
+												{
+													"referenceName": "DT_PRQ_DYN",
+													"type": "DatasetReference",
+													"parameters": {
+														"P_PATH": {
+															"value": "@variables('V_PATH')",
+															"type": "Expression"
+														},
+														"P_CONTAINER": "landingzone",
+														"P_FILENAME": {
+															"value": "@variables('V_FILENAME')",
+															"type": "Expression"
+														}
+													}
+												}
+											]
+										},
+										{
+											"name": "V_FILENAME_MSSQL_INCR",
+											"type": "SetVariable",
+											"dependsOn": [],
+											"policy": {
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"variableName": "V_FILENAME",
+												"value": {
+													"value": "@concat(toLower(pipeline().parameters.P_TABLENAME),\n'_',\npipeline().parameters.P_LOAD_TYPE,\n'_', \n    formatDateTime(utcnow(),'yyyyMMddTHHmmss'), \n    '.parquet')",
+													"type": "Expression"
+												}
+											}
+										},
+										{
+											"name": "V_PATH_MSSQL_INCR",
+											"type": "SetVariable",
+											"dependsOn": [],
+											"policy": {
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"variableName": "V_PATH",
+												"value": {
+													"value": "@concat(\n    toUpper(pipeline().parameters.P_PATH), \n    '/',\n    formatDateTime(utcNow(),'yyyy'), \n    '/', \n    formatDateTime(utcNow(),'MM'), \n    '/', \n    formatDateTime(utcNow(),'dd')    \n  \n)",
+													"type": "Expression"
+												}
+											}
+										},
+										{
+											"name": "Notebook1",
+											"type": "DatabricksNotebook",
+											"dependsOn": [
+												{
+													"activity": "CP_MSSQL_INCREMENTAL",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"notebookPath": "/Workspace/Users/raphaelfreixo@gmail.com/Get_Metadata_raw",
+												"baseParameters": {
+													"P_CONTAINER": "landingzone",
+													"P_PATH": {
+														"value": "@variables('V_PATH')",
+														"type": "Expression"
+													},
+													"P_FILENAME": {
+														"value": "@variables('V_FILENAME')",
+														"type": "Expression"
+													},
+													"P_WATERMARK_COLUMN": {
+														"value": "@pipeline().parameters.P_WATERMARK_COLUMN",
+														"type": "Expression"
+													},
+													"P_STORAGE_ACCOUNT": "dlseventtriggerdev"
+												}
+											},
+											"linkedServiceName": {
+												"referenceName": "AzureDatabricks1",
+												"type": "LinkedServiceReference"
+											}
+										}
+									]
+								}
+							],
+							"defaultActivities": [
+								{
+									"name": "CP_MSSQL_FULL",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "V_FILENAME_MSSQL_FULL",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "V_PATH_MSSQL_FULL",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@concat('SELECT ',\n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME  FROM ',\n    pipeline().parameters.P_SYSTEM,\n    '.',\n    pipeline().parameters.P_SCHEMA,\n    '.',\n    pipeline().parameters.P_TABLENAME\n   \n)\n",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DT_SRC_MSSQL",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_TABLENAME": {
+													"value": "@pipeline().parameters.P_TABLENAME",
+													"type": "Expression"
+												},
+												"P_SCHEMA": {
+													"value": "@pipeline().parameters.P_SCHEMA",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DT_PRQ_DYN",
+											"type": "DatasetReference",
+											"parameters": {
+												"P_PATH": {
+													"value": "@pipeline().parameters.P_PATH",
+													"type": "Expression"
+												},
+												"P_CONTAINER": "landingzone",
+												"P_FILENAME": {
+													"value": "@pipeline().parameters.P_TABLENAME",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "V_FILENAME_MSSQL_FULL",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_FILENAME",
+										"value": {
+											"value": "@concat(toLower(pipeline().parameters.P_TABLENAME),\n'_',\npipeline().parameters.P_LOAD_TYPE,\n'_', \n    formatDateTime(utcnow(),'yyyyMMddTHHmmss'), \n    '.parquet')",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "V_PATH_MSSQL_FULL",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "V_PATH",
+										"value": {
+											"value": "@concat(\n    toUpper(pipeline().parameters.P_PATH), \n    '/',\n    formatDateTime(utcNow(),'yyyy'), \n    '/', \n    formatDateTime(utcNow(),'MM'), \n    '/', \n    formatDateTime(utcNow(),'dd')    \n  \n)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"P_TECH": {
+						"type": "string"
+					},
+					"P_SERVER": {
+						"type": "string"
+					},
+					"P_SYSTEM": {
+						"type": "string"
+					},
+					"P_SCHEMA": {
+						"type": "string"
+					},
+					"P_TABLENAME": {
+						"type": "string"
+					},
+					"P_LOAD_TYPE": {
+						"type": "string"
+					},
+					"P_WATERMARK": {
+						"type": "string"
+					},
+					"P_CHK_BIG_NUMBER": {
+						"type": "string"
+					},
+					"P_ACTIVE": {
+						"type": "string"
+					},
+					"P_SENSITIVE_DATA": {
+						"type": "string"
+					},
+					"P_SELECT_COLUMN": {
+						"type": "string"
+					},
+					"P_SELECT_COLUMN_MAX": {
+						"type": "string"
+					},
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_WATERMARK_COLUMN": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"V_PATH": {
+						"type": "String"
+					},
+					"V_FILENAME": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-03-02T02:42:13Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DT_SRC_MSSQL')]",
+				"[concat(variables('factoryId'), '/datasets/DT_PRQ_DYN')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "LKUP_CONTROL_TABLE",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "LKUP_CONTROL_TABLE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('LKUP_CONTROL_TABLE').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "Switch1",
+									"type": "Switch",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"on": {
+											"value": "@item().TECH",
+											"type": "Expression"
+										},
+										"cases": [
+											{
+												"value": "HANA",
+												"activities": [
+													{
+														"name": "Set variable1_copy1",
+														"type": "SetVariable",
+														"dependsOn": [],
+														"policy": {
+															"secureOutput": false,
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"variableName": "APAGAR",
+															"value": "S"
+														}
+													}
+												]
+											},
+											{
+												"value": "ORACLE",
+												"activities": [
+													{
+														"name": "Set variable1_copy2",
+														"type": "SetVariable",
+														"dependsOn": [],
+														"policy": {
+															"secureOutput": false,
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"variableName": "APAGAR",
+															"value": "S"
+														}
+													}
+												]
+											},
+											{
+												"value": "MYSQL",
+												"activities": [
+													{
+														"name": "Set variable1_copy3",
+														"type": "SetVariable",
+														"dependsOn": [],
+														"policy": {
+															"secureOutput": false,
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"variableName": "APAGAR",
+															"value": "S"
+														}
+													}
+												]
+											},
+											{
+												"value": "POSTGRES",
+												"activities": [
+													{
+														"name": "Set variable1_copy4",
+														"type": "SetVariable",
+														"dependsOn": [],
+														"policy": {
+															"secureOutput": false,
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"variableName": "APAGAR",
+															"value": "S"
+														}
+													}
+												]
+											},
+											{
+												"value": "MSSQL",
+												"activities": [
+													{
+														"name": "PL_SRC_STG_INCR",
+														"type": "ExecutePipeline",
+														"dependsOn": [],
+														"policy": {
+															"secureInput": false
+														},
+														"userProperties": [],
+														"typeProperties": {
+															"pipeline": {
+																"referenceName": "PL_SRC_STG_INCR",
+																"type": "PipelineReference"
+															},
+															"waitOnCompletion": true,
+															"parameters": {
+																"P_TECH": {
+																	"value": "@item().TECH",
+																	"type": "Expression"
+																},
+																"P_SERVER": {
+																	"value": "@item().SERVER",
+																	"type": "Expression"
+																},
+																"P_SYSTEM": {
+																	"value": "@item().SYSTEM",
+																	"type": "Expression"
+																},
+																"P_SCHEMA": {
+																	"value": "@item().SCHEMA",
+																	"type": "Expression"
+																},
+																"P_TABLENAME": {
+																	"value": "@item().TABLENAME",
+																	"type": "Expression"
+																},
+																"P_LOAD_TYPE": {
+																	"value": "@item().LOAD_TYPE",
+																	"type": "Expression"
+																},
+																"P_WATERMARK": {
+																	"value": "@item().WATERMARK",
+																	"type": "Expression"
+																},
+																"P_CHK_BIG_NUMBER": {
+																	"value": "@item().CHK_BIG_NUMBER",
+																	"type": "Expression"
+																},
+																"P_ACTIVE": {
+																	"value": "@item().ACTIVE",
+																	"type": "Expression"
+																},
+																"P_SENSITIVE_DATA": {
+																	"value": "@item().SENSITIVE_DATA",
+																	"type": "Expression"
+																},
+																"P_SELECT_COLUMN": {
+																	"value": "@item().SELECT_COLUMN",
+																	"type": "Expression"
+																},
+																"P_SELECT_COLUMN_MAX": {
+																	"value": "@item().SELECT_COLUMN_MAX",
+																	"type": "Expression"
+																},
+																"P_PATH": {
+																	"value": "@item().PATH",
+																	"type": "Expression"
+																},
+																"P_WATERMARK_COLUMN": {
+																	"value": "@item().WATERMARK_COLUMN",
+																	"type": "Expression"
+																}
+															}
+														}
+													}
+												]
+											}
+										],
+										"defaultActivities": [
+											{
+												"name": "Set variable1",
+												"type": "SetVariable",
+												"dependsOn": [],
+												"policy": {
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"variableName": "APAGAR",
+													"value": "S"
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"APAGAR": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "SqlServer/PROCESS"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-03-02T02:27:23Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]",
+				"[concat(variables('factoryId'), '/pipelines/PL_SRC_STG_INCR')]"
+			]
+		}
+	]
+}
