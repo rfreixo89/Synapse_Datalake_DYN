@@ -20,6 +20,9 @@
 		"LS_DLS_accountKey": {
 			"value": ""
 		},
+		"LS_SQL_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=srv-ey-event.database.windows.net;Initial Catalog=sql-ey-event"
+		},
 		"AzureDatabricks1_properties_typeProperties_existingClusterId": {
 			"value": "0304-000144-5r6215d2"
 		},
