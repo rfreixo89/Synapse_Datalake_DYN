@@ -26,7 +26,7 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@concat(\n    toUpper(dataset().P_PATH), \n    '/',\n    formatDateTime(utcNow(),'yyyy'), \n    '/', \n    formatDateTime(utcNow(),'MM'), \n    '/', \n    formatDateTime(utcNow(),'dd')    \n  \n)",
+					"value": "@dataset().P_PATH\n",
 					"type": "Expression"
 				},
 				"fileSystem": {

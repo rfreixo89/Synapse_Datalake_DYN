@@ -150,7 +150,7 @@
 									"typeProperties": {
 										"notebookPath": "/Workspace/Users/raphaelfreixo@gmail.com/Get_Metadata_raw",
 										"baseParameters": {
-											"P_STORAGE_ACCOUNT": "landingzone",
+											"P_CONTAINER": "landingzone",
 											"P_PATH": {
 												"value": "@variables('V_PATH')",
 												"type": "Expression"
@@ -162,7 +162,8 @@
 											"P_WATERMARK_COLUMN": {
 												"value": "@pipeline().parameters.P_WATERMARK_COLUMN",
 												"type": "Expression"
-											}
+											},
+											"P_STORAGE_ACCOUNT": "dlseventtriggerdev"
 										}
 									},
 									"linkedServiceName": {
