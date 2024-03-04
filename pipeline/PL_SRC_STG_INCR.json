@@ -127,6 +127,48 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "Notebook1",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "CP_MSSQL_INCREMENTAL",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Workspace/Users/raphaelfreixo@gmail.com/Get_Metadata_raw",
+										"baseParameters": {
+											"P_STORAGE_ACCOUNT": "landingzone",
+											"P_PATH": {
+												"value": "@variables('V_PATH')",
+												"type": "Expression"
+											},
+											"P_FILENAME": {
+												"value": "@variables('V_FILENAME')",
+												"type": "Expression"
+											},
+											"P_WATERMARK_COLUMN": {
+												"value": "@pipeline().parameters.P_WATERMARK_COLUMN",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "AzureDatabricks1",
+										"type": "LinkedServiceReference"
+									}
 								}
 							]
 						}
