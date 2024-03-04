@@ -62,10 +62,6 @@
 							"P_FILENAME": {
 								"value": "@pipeline().parameters.P_TABLENAME",
 								"type": "Expression"
-							},
-							"P_LOAD_TYPE": {
-								"value": "@pipeline().parameters.P_LOAD_TYPE",
-								"type": "Expression"
 							}
 						}
 					}

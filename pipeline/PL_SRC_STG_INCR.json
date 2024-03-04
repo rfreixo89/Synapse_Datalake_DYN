@@ -73,7 +73,17 @@
 									"inputs": [
 										{
 											"referenceName": "DT_SRC_MSSQL",
-											"type": "DatasetReference"
+											"type": "DatasetReference",
+											"parameters": {
+												"P_TABLENAME": {
+													"value": "@pipeline().parameters.P_TABLENAME",
+													"type": "Expression"
+												},
+												"P_SCHEMA": {
+													"value": "@pipeline().parameters.P_SCHEMA",
+													"type": "Expression"
+												}
+											}
 										}
 									],
 									"outputs": [
@@ -232,7 +242,17 @@
 							"inputs": [
 								{
 									"referenceName": "DT_SRC_MSSQL",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"P_TABLENAME": {
+											"value": "@pipeline().parameters.P_TABLENAME",
+											"type": "Expression"
+										},
+										"P_SCHEMA": {
+											"value": "@pipeline().parameters.P_SCHEMA",
+											"type": "Expression"
+										}
+									}
 								}
 							],
 							"outputs": [
