@@ -1,10 +1,20 @@
 {
 	"name": "LS_SQL",
 	"properties": {
+		"parameters": {
+			"P_FQDN_SRV": {
+				"type": "string",
+				"defaultValue": "srv-ey-event.database.windows.net"
+			},
+			"P_DB_NAME": {
+				"type": "string",
+				"defaultValue": "sql-ey-event"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
-			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=srv-ey-event.database.windows.net;Initial Catalog=sql-ey-event"
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().P_FQDN_SRV};Initial Catalog=@{linkedService().P_DB_NAME}"
 		}
 	}
 }
