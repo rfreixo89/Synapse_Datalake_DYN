@@ -3,7 +3,11 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_SQL",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"P_FQDN_SRV": "srv-ey-event.database.windows.net",
+				"P_DB_NAME": "sql-ey-event"
+			}
 		},
 		"parameters": {
 			"P_TABLENAME": {
