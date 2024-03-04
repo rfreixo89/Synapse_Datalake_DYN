@@ -2,7 +2,7 @@
 	"name": "DT_ASQL_SAMPLEDB_DYN",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "LS_ASQL_SAMPLEDB",
+			"referenceName": "LS_SQL",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],

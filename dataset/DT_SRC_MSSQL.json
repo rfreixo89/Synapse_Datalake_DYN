@@ -2,7 +2,7 @@
 	"name": "DT_SRC_MSSQL",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureSqlDatabase2",
+			"referenceName": "LS_SQL",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
