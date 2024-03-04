@@ -7,33 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-event-trigger-dev"
 		},
-		"AzureSqlDatabase1_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=mvpservcorteva.database.windows.net;Initial Catalog=MVPSQLCORTEVA"
-		},
-		"AzureSqlDatabase2_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase2'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=srv-event-triger-dev.database.windows.net;Initial Catalog=sql-serverless-corteva"
-		},
-		"LS_ASQL_SAMPLEDB_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_ASQL_SAMPLEDB'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sqlcortdev.database.windows.net;Initial Catalog=sampledb"
-		},
-		"LS_ASTB_CONTROL_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_ASTB_CONTROL'"
-		},
-		"LS_DLS_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'LS_DLS'"
-		},
 		"LS_SQL_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_SQL'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=srv-ey-event.database.windows.net;Initial Catalog=sql-ey-event"
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().P_FQDN_SRV};Initial Catalog=@{linkedService().P_DB_NAME}"
 		},
 		"AzureDatabricks1_properties_typeProperties_existingClusterId": {
 			"type": "string",
@@ -41,7 +18,7 @@
 		},
 		"LS_DLS_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://dlseventtriggerdev.dfs.core.windows.net/"
+			"defaultValue": "@{linkedService().P_DLS_DFS_URL}"
 		}
 	},
 	"variables": {
@@ -990,7 +967,11 @@
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "LS_SQL",
-					"type": "LinkedServiceReference"
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"P_FQDN_SRV": "srv-ey-event.database.windows.net",
+						"P_DB_NAME": "sql-ey-event"
+					}
 				},
 				"parameters": {
 					"P_TABLENAME": {
@@ -1125,70 +1106,20 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase1')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabase2')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureSqlDatabase2_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_ASQL_SAMPLEDB')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_ASQL_SAMPLEDB_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_ASTB_CONTROL')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureTableStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_ASTB_CONTROL_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/LS_DLS')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"parameters": {
+					"P_DLS_DFS_URL": {
+						"type": "string",
+						"defaultValue": "https://dlseventtriggerdev.dfs.core.windows.net/"
+					}
+				},
 				"annotations": [],
 				"type": "AzureBlobFS",
 				"typeProperties": {
-					"url": "[parameters('LS_DLS_properties_typeProperties_url')]",
-					"accountKey": {
-						"type": "SecureString",
-						"value": "[parameters('LS_DLS_accountKey')]"
-					}
+					"url": "[parameters('LS_DLS_properties_typeProperties_url')]"
 				}
 			},
 			"dependsOn": []
@@ -1198,6 +1129,16 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"parameters": {
+					"P_FQDN_SRV": {
+						"type": "string",
+						"defaultValue": "srv-ey-event.database.windows.net"
+					},
+					"P_DB_NAME": {
+						"type": "string",
+						"defaultValue": "sql-ey-event"
+					}
+				},
 				"annotations": [],
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
