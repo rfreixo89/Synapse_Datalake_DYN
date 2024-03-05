@@ -1,6 +1,228 @@
 {
 	"name": "PL_COPYLOGS_RAW",
 	"properties": {
+		"activities": [
+			{
+				"name": "Notebook1",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Workspace/Users/raphaelfreixo@gmail.com/Get_Metadata_raw",
+					"baseParameters": {
+						"P_CONTAINER": {
+							"value": "@pipeline().parameters.P_CONTAINER",
+							"type": "Expression"
+						},
+						"P_PATH": {
+							"value": "@pipeline().parameters.P_PATH",
+							"type": "Expression"
+						},
+						"P_FILENAME": {
+							"value": "@pipeline().parameters.P_FILE_NAME",
+							"type": "Expression"
+						},
+						"P_STORAGE_ACCOUNT": {
+							"value": "@pipeline().parameters.P_STORAGE_ACCOUNT",
+							"type": "Expression"
+						},
+						"P_ADF_NAME": {
+							"value": "@pipeline().parameters.P_ADF_NAME",
+							"type": "Expression"
+						},
+						"P_PL_NAME": {
+							"value": "@pipeline().parameters.P_PL_NAME",
+							"type": "Expression"
+						},
+						"P_PL_GROUP_ID": {
+							"value": "@pipeline().parameters.P_PL_GROUP_ID",
+							"type": "Expression"
+						},
+						"P_PL_ID": {
+							"value": "@pipeline().parameters.P_PL_ID",
+							"type": "Expression"
+						},
+						"P_TRG_ID": {
+							"value": "@pipeline().parameters.P_TRG_ID",
+							"type": "Expression"
+						},
+						"P_TRG_NAME": {
+							"value": "@pipeline().parameters.P_TRG_NAME",
+							"type": "Expression"
+						},
+						"P_TRG_TYPE": {
+							"value": "@pipeline().parameters.P_TRG_TYPE",
+							"type": "Expression"
+						},
+						"P_TRG_TIME": {
+							"value": "@pipeline().parameters.P_TRG_TIME",
+							"type": "Expression"
+						},
+						"P_TRG_PL_NAME": {
+							"value": "@pipeline().parameters.P_TRG_PL_NAME",
+							"type": "Expression"
+						},
+						"P_TRG_PL_ID": {
+							"value": "@pipeline().parameters.P_TRG_ID",
+							"type": "Expression"
+						},
+						"P_DATAREAD_KB": {
+							"value": "@pipeline().parameters.P_DATAREAD_KB",
+							"type": "Expression"
+						},
+						"P_DATAWRITTEN_KB": {
+							"value": "@pipeline().parameters.P_DATAWRITTEN_KB",
+							"type": "Expression"
+						},
+						"P_DURATION_ACT_SEG": {
+							"value": "@pipeline().parameters.P_DURATION_ACT_SEG",
+							"type": "Expression"
+						},
+						"P_ROWSCOPIED_UNIT": {
+							"value": "@pipeline().parameters.P_ROWSCOPIED_UNIT",
+							"type": "Expression"
+						},
+						"P_ROWSREAD_UNIT": {
+							"value": "@pipeline().parameters.P_ROWSREAD_UNIT",
+							"type": "Expression"
+						},
+						"P_STATUS": {
+							"value": "@pipeline().parameters.P_STATUS",
+							"type": "Expression"
+						},
+						"P_THROUGHTPUT_MB": {
+							"value": "@pipeline().parameters.P_THROUGHTPUT_MB",
+							"type": "Expression"
+						},
+						"P_LOAD_TYPE": {
+							"value": "@pipeline().parameters.P_LOAD_TYPE",
+							"type": "Expression"
+						},
+						"P_COPYDURATION_SEG": {
+							"value": "@pipeline().parameters.P_COPYDURATION_SEG",
+							"type": "Expression"
+						},
+						"P_TABLENAME": {
+							"value": "@pipeline().parameters.P_TABLENAME",
+							"type": "Expression"
+						},
+						"P_SERVER_NAME": {
+							"value": "@pipeline().parameters.P_SERVER_NAME",
+							"type": "Expression"
+						},
+						"P_SCHEMA_NAME": {
+							"value": "@pipeline().parameters.P_SCHEMA_NAME",
+							"type": "Expression"
+						},
+						"P_APPLICATION": {
+							"value": "@pipeline().parameters.P_APPLICATION",
+							"type": "Expression"
+						},
+						"P_START_TIME": {
+							"value": "@pipeline().parameters.P_START_TIME",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"P_APPLICATION": {
+				"type": "string"
+			},
+			"P_SCHEMA_NAME": {
+				"type": "string"
+			},
+			"P_SERVER_NAME": {
+				"type": "string"
+			},
+			"P_TABLENAME": {
+				"type": "string"
+			},
+			"P_LOAD_TYPE": {
+				"type": "string"
+			},
+			"P_STORAGE_ACCOUNT": {
+				"type": "string"
+			},
+			"P_PATH": {
+				"type": "string"
+			},
+			"P_FILE_NAME": {
+				"type": "string"
+			},
+			"P_CONTAINER": {
+				"type": "string"
+			},
+			"P_ADF_NAME": {
+				"type": "string"
+			},
+			"P_PL_NAME": {
+				"type": "string"
+			},
+			"P_PL_GROUP_ID": {
+				"type": "string"
+			},
+			"P_PL_ID": {
+				"type": "string"
+			},
+			"P_TRG_ID": {
+				"type": "string"
+			},
+			"P_TRG_NAME": {
+				"type": "string"
+			},
+			"P_TRG_TYPE": {
+				"type": "string"
+			},
+			"P_TRG_TIME": {
+				"type": "string"
+			},
+			"P_TRG_PL_NAME": {
+				"type": "string"
+			},
+			"P_TRG_PL_ID": {
+				"type": "string"
+			},
+			"P_DATAREAD_KB": {
+				"type": "string"
+			},
+			"P_DATAWRITTEN_KB": {
+				"type": "string"
+			},
+			"P_DURATION_ACT_SEG": {
+				"type": "string"
+			},
+			"P_ROWSCOPIED_UNIT": {
+				"type": "string"
+			},
+			"P_ROWSREAD_UNIT": {
+				"type": "string"
+			},
+			"P_STATUS": {
+				"type": "string"
+			},
+			"P_THROUGHTPUT_MB": {
+				"type": "string"
+			},
+			"P_COPYDURATION_SEG": {
+				"type": "string"
+			},
+			"P_START_TIME": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }
