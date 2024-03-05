@@ -412,6 +412,9 @@
 				"type": "String"
 			}
 		},
+		"folder": {
+			"name": "DATALAKE DYN/MSSQL/DYNAMICS PIPES"
+		},
 		"annotations": [],
 		"lastPublishTime": "2024-03-02T02:42:13Z"
 	},
