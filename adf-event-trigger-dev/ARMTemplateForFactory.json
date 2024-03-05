@@ -264,7 +264,7 @@
 									"type": "Expression"
 								},
 								"P_LOAD_TYPE": {
-									"value": "@string('F')",
+									"value": "@pipeline().parameters.P_LOAD_TYPE",
 									"type": "Expression"
 								},
 								"P_STORAGE_ACCOUNT": {
