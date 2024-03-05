@@ -215,8 +215,16 @@
 															"value": "@item().SYSTEM",
 															"type": "Expression"
 														},
+														"P_CONTAINER_1": {
+															"value": "@pipeline().parameters.P_CONTAINER_1",
+															"type": "Expression"
+														},
 														"P_STORAGEACCOUNT": {
 															"value": "@pipeline().parameters.P_STORAGEACCOUNT",
+															"type": "Expression"
+														},
+														"P_PROJECT_NAME": {
+															"value": "@item().PROJECT_NAME",
 															"type": "Expression"
 														}
 													}
