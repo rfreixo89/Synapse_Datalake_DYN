@@ -141,7 +141,7 @@
 										"value": "MSSQL",
 										"activities": [
 											{
-												"name": "PL_SRC_STG_INCR",
+												"name": "PL_SRC_TO_LDZ_MSSQL",
 												"type": "ExecutePipeline",
 												"dependsOn": [],
 												"policy": {
@@ -150,7 +150,7 @@
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
-														"referenceName": "PL_SRC_STG_INCR",
+														"referenceName": "01_PL_SRC_STG_LOAD_MSSQL",
 														"type": "PipelineReference"
 													},
 													"waitOnCompletion": true,
@@ -225,6 +225,10 @@
 														},
 														"P_PROJECT_NAME": {
 															"value": "@item().PROJECT_NAME",
+															"type": "Expression"
+														},
+														"P_DATA_DOMAIN": {
+															"value": "@item().DATA_DOMAIN",
 															"type": "Expression"
 														}
 													}
