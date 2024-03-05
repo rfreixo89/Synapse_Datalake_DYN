@@ -61,7 +61,7 @@
 					},
 					"ifFalseActivities": [
 						{
-							"name": "CP_MSSQL_INCREMENTAL_FLAG_TRUE",
+							"name": "CP_MSSQL_INCREMENTAL_FLAG_FALSE",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -143,7 +143,7 @@
 							"type": "DatabricksNotebook",
 							"dependsOn": [
 								{
-									"activity": "CP_MSSQL_INCREMENTAL_FLAG_TRUE",
+									"activity": "CP_MSSQL_INCREMENTAL_FLAG_FALSE",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -212,7 +212,7 @@
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "CP_MSSQL_INCREMENTAL_FLAG_TRUE",
+									"activity": "CP_MSSQL_INCREMENTAL_FLAG_FALSE",
 									"dependencyConditions": [
 										"Completed"
 									]
@@ -306,39 +306,39 @@
 										"type": "Expression"
 									},
 									"P_DATAREAD_KB": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.dataRead",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.dataRead",
 										"type": "Expression"
 									},
 									"P_DATAWRITTEN_KB": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.dataWritten",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.dataWritten",
 										"type": "Expression"
 									},
 									"P_DURATION_ACT_SEG": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.executionDetails[0].duration",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.executionDetails[0].duration",
 										"type": "Expression"
 									},
 									"P_ROWSCOPIED_UNIT": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.rowsCopied",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.rowsCopied",
 										"type": "Expression"
 									},
 									"P_ROWSREAD_UNIT": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.rowsRead",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.rowsRead",
 										"type": "Expression"
 									},
 									"P_STATUS": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.executionDetails[0].status",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.executionDetails[0].status",
 										"type": "Expression"
 									},
 									"P_THROUGHTPUT_MB": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.throughput",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.throughput",
 										"type": "Expression"
 									},
 									"P_COPYDURATION_SEG": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.copyDuration",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.copyDuration",
 										"type": "Expression"
 									},
 									"P_START_TIME": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.executionDetails[0].start",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.executionDetails[0].start",
 										"type": "Expression"
 									},
 									"P_PROJECT_NAME": {
@@ -514,7 +514,7 @@
 					],
 					"ifTrueActivities": [
 						{
-							"name": "CP_MSSQL_INCREMENTAL_copy1",
+							"name": "CP_MSSQL_INCREMENTAL_FLAG_TRUE",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -596,7 +596,7 @@
 							"type": "DatabricksNotebook",
 							"dependsOn": [
 								{
-									"activity": "CP_MSSQL_INCREMENTAL_copy1",
+									"activity": "CP_MSSQL_INCREMENTAL_FLAG_TRUE",
 									"dependencyConditions": [
 										"Completed"
 									]
@@ -665,7 +665,7 @@
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "CP_MSSQL_INCREMENTAL_copy1",
+									"activity": "CP_MSSQL_INCREMENTAL_FLAG_TRUE",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -759,39 +759,39 @@
 										"type": "Expression"
 									},
 									"P_DATAREAD_KB": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.dataRead",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.dataRead",
 										"type": "Expression"
 									},
 									"P_DATAWRITTEN_KB": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.dataWritten",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.dataWritten",
 										"type": "Expression"
 									},
 									"P_DURATION_ACT_SEG": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.executionDetails[0].duration",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.executionDetails[0].duration",
 										"type": "Expression"
 									},
 									"P_ROWSCOPIED_UNIT": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.rowsCopied",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.rowsCopied",
 										"type": "Expression"
 									},
 									"P_ROWSREAD_UNIT": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.rowsRead",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.rowsRead",
 										"type": "Expression"
 									},
 									"P_STATUS": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.executionDetails[0].status",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.executionDetails[0].status",
 										"type": "Expression"
 									},
 									"P_THROUGHTPUT_MB": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.throughput",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.throughput",
 										"type": "Expression"
 									},
 									"P_COPYDURATION_SEG": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.copyDuration",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.copyDuration",
 										"type": "Expression"
 									},
 									"P_START_TIME": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL').output.executionDetails[0].start",
+										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.executionDetails[0].start",
 										"type": "Expression"
 									},
 									"P_PROJECT_NAME": {
