@@ -435,6 +435,81 @@
 								],
 								"scriptBlockExecutionTimeout": "02:00:00"
 							}
+						},
+						{
+							"name": "SCR_UPDATE_FLAG_FULL_LOAD",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "SCR_UPDATE_WATERMARK_FLAG_TRUE",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "LS_SQL",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"P_FQDN_SRV": "srv-ey-event.database.windows.net",
+									"P_DB_NAME": "sql-ey-event"
+								}
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"parameters": [
+											{
+												"name": "P_TABLENAME",
+												"type": "String",
+												"value": {
+													"value": "@pipeline().parameters.P_TABLENAME",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "P_SCHEMA",
+												"type": "String",
+												"value": {
+													"value": "@pipeline().parameters.P_SCHEMA",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "P_PROJECT_NAME",
+												"type": "String",
+												"value": {
+													"value": "@pipeline().parameters.P_PROJECT_NAME",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "P_SERVER",
+												"type": "String",
+												"value": {
+													"value": "@pipeline().parameters.P_SERVER",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											}
+										],
+										"type": "Query",
+										"text": "update [dbo].[CONTROL_TABLE] set \r\nFULL_LOAD_FLAG = 'Y'\r\n where [SERVER] = @P_SERVER and TABLENAME = @P_TABLENAME and PROJECT_NAME= @P_PROJECT_NAME AND [SCHEMA]= @P_SCHEMA"
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
 						}
 					],
 					"ifTrueActivities": [
