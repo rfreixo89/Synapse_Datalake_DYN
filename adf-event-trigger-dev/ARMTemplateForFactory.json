@@ -1924,6 +1924,7 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
+							"batchCount": 2,
 							"activities": [
 								{
 									"name": "01_PL_SRC_LDZ_LOAD_MSSQL",
