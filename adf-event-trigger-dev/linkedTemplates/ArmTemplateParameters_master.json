@@ -12,7 +12,7 @@
 			"value": "0304-000144-5r6215d2"
 		},
 		"LS_DLS_properties_typeProperties_url": {
-			"value": "@{linkedService().P_DLS_DFS_URL}"
+			"value": "@{concat('https://',\nlinkedService().P_STORAGE_ACCOUNT,\n'.dfs.core.windows.net')}"
 		},
 		"containerUri": {
 			"value": ""

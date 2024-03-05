@@ -18,7 +18,7 @@
 		},
 		"LS_DLS_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "@{linkedService().P_DLS_DFS_URL}"
+			"defaultValue": "@{concat('https://',\nlinkedService().P_STORAGE_ACCOUNT,\n'.dfs.core.windows.net')}"
 		}
 	},
 	"variables": {
@@ -142,6 +142,249 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/PL_CP_ACT_RAW')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "NB_COPY_LOGS",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Workspace/Users/raphaelfreixo@gmail.com/ADB_NB_LOGS",
+							"baseParameters": {
+								"P_CONTAINER": {
+									"value": "@pipeline().parameters.P_CONTAINER",
+									"type": "Expression"
+								},
+								"P_PATH": {
+									"value": "@pipeline().parameters.P_PATH",
+									"type": "Expression"
+								},
+								"P_FILENAME": {
+									"value": "@pipeline().parameters.P_FILE_NAME",
+									"type": "Expression"
+								},
+								"P_STORAGE_ACCOUNT": {
+									"value": "@pipeline().parameters.P_STORAGE_ACCOUNT",
+									"type": "Expression"
+								},
+								"P_ADF_NAME": {
+									"value": "@pipeline().parameters.P_ADF_NAME",
+									"type": "Expression"
+								},
+								"P_PL_NAME": {
+									"value": "@pipeline().parameters.P_PL_NAME",
+									"type": "Expression"
+								},
+								"P_PL_GROUP_ID": {
+									"value": "@pipeline().parameters.P_PL_GROUP_ID",
+									"type": "Expression"
+								},
+								"P_PL_ID": {
+									"value": "@pipeline().parameters.P_PL_ID",
+									"type": "Expression"
+								},
+								"P_TRG_ID": {
+									"value": "@pipeline().parameters.P_TRG_ID",
+									"type": "Expression"
+								},
+								"P_TRG_NAME": {
+									"value": "@pipeline().parameters.P_TRG_NAME",
+									"type": "Expression"
+								},
+								"P_TRG_TYPE": {
+									"value": "@pipeline().parameters.P_TRG_TYPE",
+									"type": "Expression"
+								},
+								"P_TRG_TIME": {
+									"value": "@pipeline().parameters.P_TRG_TIME",
+									"type": "Expression"
+								},
+								"P_TRG_PL_NAME": {
+									"value": "@pipeline().parameters.P_TRG_PL_NAME",
+									"type": "Expression"
+								},
+								"P_TRG_PL_ID": {
+									"value": "@pipeline().parameters.P_TRG_ID",
+									"type": "Expression"
+								},
+								"P_DATAREAD_KB": {
+									"value": "@string(pipeline().parameters.P_DATAREAD_KB)",
+									"type": "Expression"
+								},
+								"P_DATAWRITTEN_KB": {
+									"value": "@string(pipeline().parameters.P_DATAWRITTEN_KB)",
+									"type": "Expression"
+								},
+								"P_DURATION_ACT_SEG": {
+									"value": "@string(pipeline().parameters.P_DURATION_ACT_SEG)",
+									"type": "Expression"
+								},
+								"P_ROWSCOPIED_UNIT": {
+									"value": "@string(pipeline().parameters.P_ROWSCOPIED_UNIT)",
+									"type": "Expression"
+								},
+								"P_ROWSREAD_UNIT": {
+									"value": "@string(pipeline().parameters.P_ROWSREAD_UNIT)",
+									"type": "Expression"
+								},
+								"P_STATUS": {
+									"value": "@string(pipeline().parameters.P_STATUS)",
+									"type": "Expression"
+								},
+								"P_THROUGHTPUT_MB": {
+									"value": "@string(pipeline().parameters.P_THROUGHTPUT_MB)",
+									"type": "Expression"
+								},
+								"P_LOAD_TYPE": {
+									"value": "@pipeline().parameters.P_LOAD_TYPE",
+									"type": "Expression"
+								},
+								"P_COPYDURATION_SEG": {
+									"value": "@string(pipeline().parameters.P_COPYDURATION_SEG)",
+									"type": "Expression"
+								},
+								"P_TABLENAME": {
+									"value": "@pipeline().parameters.P_TABLENAME",
+									"type": "Expression"
+								},
+								"P_SERVER_NAME": {
+									"value": "@pipeline().parameters.P_SERVER_NAME",
+									"type": "Expression"
+								},
+								"P_SCHEMA_NAME": {
+									"value": "@pipeline().parameters.P_SCHEMA_NAME",
+									"type": "Expression"
+								},
+								"P_APPLICATION": {
+									"value": "@pipeline().parameters.P_APPLICATION",
+									"type": "Expression"
+								},
+								"P_START_TIME": {
+									"value": "@string(pipeline().parameters.P_START_TIME)",
+									"type": "Expression"
+								},
+								"P_PROJECT_NAME": {
+									"value": "@pipeline().parameters.P_PROJECT_NAME",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureDatabricks1",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"P_APPLICATION": {
+						"type": "string"
+					},
+					"P_SCHEMA_NAME": {
+						"type": "string"
+					},
+					"P_SERVER_NAME": {
+						"type": "string"
+					},
+					"P_TABLENAME": {
+						"type": "string"
+					},
+					"P_LOAD_TYPE": {
+						"type": "string"
+					},
+					"P_STORAGE_ACCOUNT": {
+						"type": "string"
+					},
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_FILE_NAME": {
+						"type": "string"
+					},
+					"P_CONTAINER": {
+						"type": "string"
+					},
+					"P_ADF_NAME": {
+						"type": "string"
+					},
+					"P_PL_NAME": {
+						"type": "string"
+					},
+					"P_PL_GROUP_ID": {
+						"type": "string"
+					},
+					"P_PL_ID": {
+						"type": "string"
+					},
+					"P_TRG_ID": {
+						"type": "string"
+					},
+					"P_TRG_NAME": {
+						"type": "string"
+					},
+					"P_TRG_TYPE": {
+						"type": "string"
+					},
+					"P_TRG_TIME": {
+						"type": "string"
+					},
+					"P_TRG_PL_NAME": {
+						"type": "string"
+					},
+					"P_TRG_PL_ID": {
+						"type": "string"
+					},
+					"P_DATAREAD_KB": {
+						"type": "string"
+					},
+					"P_DATAWRITTEN_KB": {
+						"type": "string"
+					},
+					"P_DURATION_ACT_SEG": {
+						"type": "string"
+					},
+					"P_ROWSCOPIED_UNIT": {
+						"type": "string"
+					},
+					"P_ROWSREAD_UNIT": {
+						"type": "string"
+					},
+					"P_STATUS": {
+						"type": "string"
+					},
+					"P_THROUGHTPUT_MB": {
+						"type": "string"
+					},
+					"P_COPYDURATION_SEG": {
+						"type": "string"
+					},
+					"P_START_TIME": {
+						"type": "string"
+					},
+					"P_PROJECT_NAME": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/PL_SRC_STG_INCR')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -190,7 +433,7 @@
 												"source": {
 													"type": "AzureSqlSource",
 													"sqlReaderQuery": {
-														"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME FROM [',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    '] WHERE ',\n    pipeline().parameters.P_WATERMARK_COLUMN,\n    ' > ',\n    '''',\n    pipeline().parameters.P_WATERMARK,\n    ''''\n)\n",
+														"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME FROM [',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    '] WHERE ',\n    pipeline().parameters.P_WATERMARK_COLUMN,\n    ' > ',\n    '''',\n    pipeline().parameters.P_WATERMARK,\n    ''''\n)",
 														"type": "Expression"
 													},
 													"queryTimeout": "02:00:00",
@@ -240,7 +483,10 @@
 															"value": "@variables('V_PATH')",
 															"type": "Expression"
 														},
-														"P_CONTAINER": "landingzone",
+														"P_CONTAINER": {
+															"value": "@pipeline().parameters.P_CONTAINER_1",
+															"type": "Expression"
+														},
 														"P_FILENAME": {
 															"value": "@variables('V_FILENAME')",
 															"type": "Expression"
@@ -284,7 +530,7 @@
 											}
 										},
 										{
-											"name": "Notebook1",
+											"name": "NB_GET_WATERMARK",
 											"type": "DatabricksNotebook",
 											"dependsOn": [
 												{
@@ -303,9 +549,12 @@
 											},
 											"userProperties": [],
 											"typeProperties": {
-												"notebookPath": "/Workspace/Users/raphaelfreixo@gmail.com/Get_Metadata_raw",
+												"notebookPath": "/Workspace/Users/raphaelfreixo@gmail.com/ADB_NB_GET_WATERMARK",
 												"baseParameters": {
-													"P_CONTAINER": "landingzone",
+													"P_CONTAINER": {
+														"value": "@pipeline().parameters.P_CONTAINER_1",
+														"type": "Expression"
+													},
 													"P_PATH": {
 														"value": "@variables('V_PATH')",
 														"type": "Expression"
@@ -318,12 +567,252 @@
 														"value": "@pipeline().parameters.P_WATERMARK_COLUMN",
 														"type": "Expression"
 													},
-													"P_STORAGE_ACCOUNT": "dlseventtriggerdev"
+													"P_STORAGE_ACCOUNT": {
+														"value": "@pipeline().parameters.P_STORAGEACCOUNT",
+														"type": "Expression"
+													},
+													"P_TABLENAME": {
+														"value": "@pipeline().parameters.P_TABLENAME",
+														"type": "Expression"
+													},
+													"P_SERVER_NAME": {
+														"value": "@pipeline().parameters.P_SERVER",
+														"type": "Expression"
+													},
+													"P_SCHEMA_NAME": {
+														"value": "@pipeline().parameters.P_SCHEMA",
+														"type": "Expression"
+													},
+													"P_APPLICATION": {
+														"value": "@pipeline().parameters.P_APPLICATION",
+														"type": "Expression"
+													}
 												}
 											},
 											"linkedServiceName": {
 												"referenceName": "AzureDatabricks1",
 												"type": "LinkedServiceReference"
+											}
+										},
+										{
+											"name": "PL_CP_ACT_RAW",
+											"type": "ExecutePipeline",
+											"dependsOn": [
+												{
+													"activity": "CP_MSSQL_INCREMENTAL",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"pipeline": {
+													"referenceName": "PL_CP_ACT_RAW",
+													"type": "PipelineReference"
+												},
+												"waitOnCompletion": true,
+												"parameters": {
+													"P_APPLICATION": {
+														"value": "@pipeline().parameters.P_APPLICATION",
+														"type": "Expression"
+													},
+													"P_SCHEMA_NAME": {
+														"value": "@pipeline().parameters.P_SCHEMA",
+														"type": "Expression"
+													},
+													"P_SERVER_NAME": {
+														"value": "@pipeline().parameters.P_SERVER",
+														"type": "Expression"
+													},
+													"P_TABLENAME": {
+														"value": "@pipeline().parameters.P_TABLENAME",
+														"type": "Expression"
+													},
+													"P_LOAD_TYPE": {
+														"value": "@pipeline().parameters.P_LOAD_TYPE",
+														"type": "Expression"
+													},
+													"P_STORAGE_ACCOUNT": {
+														"value": "@pipeline().parameters.P_STORAGEACCOUNT",
+														"type": "Expression"
+													},
+													"P_PATH": {
+														"value": "@pipeline().parameters.P_PATH",
+														"type": "Expression"
+													},
+													"P_FILE_NAME": {
+														"value": "@variables('V_FILENAME')",
+														"type": "Expression"
+													},
+													"P_CONTAINER": {
+														"value": "@pipeline().parameters.P_CONTAINER_1",
+														"type": "Expression"
+													},
+													"P_ADF_NAME": {
+														"value": "@pipeline().DataFactory",
+														"type": "Expression"
+													},
+													"P_PL_NAME": {
+														"value": "@pipeline().Pipeline",
+														"type": "Expression"
+													},
+													"P_PL_GROUP_ID": {
+														"value": "@pipeline().GroupId",
+														"type": "Expression"
+													},
+													"P_PL_ID": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													},
+													"P_TRG_ID": {
+														"value": "@pipeline().TriggerId",
+														"type": "Expression"
+													},
+													"P_TRG_NAME": {
+														"value": "@pipeline().TriggerName",
+														"type": "Expression"
+													},
+													"P_TRG_TYPE": {
+														"value": "@pipeline().TriggerType",
+														"type": "Expression"
+													},
+													"P_TRG_TIME": {
+														"value": "@pipeline().TriggerTime",
+														"type": "Expression"
+													},
+													"P_TRG_PL_NAME": {
+														"value": "@pipeline()?.TriggeredByPipelineName",
+														"type": "Expression"
+													},
+													"P_TRG_PL_ID": {
+														"value": "@pipeline()?.TriggeredByPipelineRunId",
+														"type": "Expression"
+													},
+													"P_DATAREAD_KB": {
+														"value": "@activity('CP_MSSQL_INCREMENTAL').output.dataRead",
+														"type": "Expression"
+													},
+													"P_DATAWRITTEN_KB": {
+														"value": "@activity('CP_MSSQL_INCREMENTAL').output.dataWritten",
+														"type": "Expression"
+													},
+													"P_DURATION_ACT_SEG": {
+														"value": "@activity('CP_MSSQL_INCREMENTAL').output.executionDetails[0].duration",
+														"type": "Expression"
+													},
+													"P_ROWSCOPIED_UNIT": {
+														"value": "@activity('CP_MSSQL_INCREMENTAL').output.rowsCopied",
+														"type": "Expression"
+													},
+													"P_ROWSREAD_UNIT": {
+														"value": "@activity('CP_MSSQL_INCREMENTAL').output.rowsRead",
+														"type": "Expression"
+													},
+													"P_STATUS": {
+														"value": "@activity('CP_MSSQL_INCREMENTAL').output.executionDetails[0].status",
+														"type": "Expression"
+													},
+													"P_THROUGHTPUT_MB": {
+														"value": "@activity('CP_MSSQL_INCREMENTAL').output.throughput",
+														"type": "Expression"
+													},
+													"P_COPYDURATION_SEG": {
+														"value": "@activity('CP_MSSQL_INCREMENTAL').output.copyDuration",
+														"type": "Expression"
+													},
+													"P_START_TIME": {
+														"value": "@activity('CP_MSSQL_INCREMENTAL').output.executionDetails[0].start",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										{
+											"name": "Script1",
+											"type": "Script",
+											"dependsOn": [
+												{
+													"activity": "NB_GET_WATERMARK",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"linkedServiceName": {
+												"referenceName": "LS_SQL",
+												"type": "LinkedServiceReference",
+												"parameters": {
+													"P_FQDN_SRV": "srv-ey-event.database.windows.net",
+													"P_DB_NAME": "sql-ey-event"
+												}
+											},
+											"typeProperties": {
+												"scripts": [
+													{
+														"parameters": [
+															{
+																"name": "P_TABLENAME",
+																"type": "String",
+																"value": {
+																	"value": "@pipeline().parameters.P_TABLENAME",
+																	"type": "Expression"
+																},
+																"direction": "Input"
+															},
+															{
+																"name": "P_SCHEMA",
+																"type": "String",
+																"value": {
+																	"value": "@pipeline().parameters.P_SCHEMA",
+																	"type": "Expression"
+																},
+																"direction": "Input"
+															},
+															{
+																"name": "P_PROJECT_NAME",
+																"type": "String",
+																"value": {
+																	"value": "@pipeline().parameters.P_PROJECT_NAME",
+																	"type": "Expression"
+																},
+																"direction": "Input"
+															},
+															{
+																"name": "P_SERVER",
+																"type": "String",
+																"value": {
+																	"value": "@pipeline().parameters.P_SERVER",
+																	"type": "Expression"
+																},
+																"direction": "Input"
+															},
+															{
+																"name": "P_LAST_CDC_DATE",
+																"type": "String",
+																"value": {
+																	"value": "@activity('NB_GET_WATERMARK').runOutput",
+																	"type": "Expression"
+																},
+																"direction": "Input"
+															}
+														],
+														"type": "Query",
+														"text": "update [dbo].[CONTROL_TABLE] set \r\nWATERMARK_COLUMN = coalesce(P_LAST_CDC_DATE)\r\n where SERVER = @SERVER and TABLENAME = @TABLENAME; PROJECT_NAME =@PROJECT_NAME AND [SCHEMA] =@SCHEMA"
+													}
+												],
+												"scriptBlockExecutionTimeout": "02:00:00"
 											}
 										}
 									]
@@ -359,7 +848,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat('SELECT ',\n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME  FROM ',\n    pipeline().parameters.P_SYSTEM,\n    '.',\n    pipeline().parameters.P_SCHEMA,\n    '.',\n    pipeline().parameters.P_TABLENAME\n   \n)\n",
+												"value": "@concat('SELECT ',\n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME  FROM ',\n    pipeline().parameters.P_SYSTEM,\n    '.',\n    pipeline().parameters.P_SCHEMA,\n    '.',\n    pipeline().parameters.P_TABLENAME\n   \n)",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -466,7 +955,7 @@
 					"P_SERVER": {
 						"type": "string"
 					},
-					"P_SYSTEM": {
+					"P_APPLICATION": {
 						"type": "string"
 					},
 					"P_SCHEMA": {
@@ -501,6 +990,18 @@
 					},
 					"P_WATERMARK_COLUMN": {
 						"type": "string"
+					},
+					"P_SYSTEM": {
+						"type": "string"
+					},
+					"P_CONTAINER_1": {
+						"type": "string"
+					},
+					"P_STORAGEACCOUNT": {
+						"type": "string"
+					},
+					"P_PROJECT_NAME": {
+						"type": "string"
 					}
 				},
 				"variables": {
@@ -517,7 +1018,9 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DT_SRC_MSSQL')]",
 				"[concat(variables('factoryId'), '/datasets/DT_PRQ_DYN')]",
-				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]",
+				"[concat(variables('factoryId'), '/pipelines/PL_CP_ACT_RAW')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_SQL')]"
 			]
 		},
 		{
@@ -687,8 +1190,8 @@
 																	"value": "@item().SERVER",
 																	"type": "Expression"
 																},
-																"P_SYSTEM": {
-																	"value": "@item().SYSTEM",
+																"P_APPLICATION": {
+																	"value": "@item().APPLICATION",
 																	"type": "Expression"
 																},
 																"P_SCHEMA": {
@@ -734,6 +1237,22 @@
 																"P_WATERMARK_COLUMN": {
 																	"value": "@item().WATERMARK_COLUMN",
 																	"type": "Expression"
+																},
+																"P_SYSTEM": {
+																	"value": "@item().SYSTEM",
+																	"type": "Expression"
+																},
+																"P_CONTAINER_1": {
+																	"value": "@pipeline().parameters.P_CONTAINER_1",
+																	"type": "Expression"
+																},
+																"P_STORAGEACCOUNT": {
+																	"value": "@pipeline().parameters.P_STORAGEACCOUNT",
+																	"type": "Expression"
+																},
+																"P_PROJECT_NAME": {
+																	"value": "@item().PROJECT_NAME",
+																	"type": "Expression"
 																}
 															}
 														}
@@ -765,6 +1284,16 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"P_STORAGEACCOUNT": {
+						"type": "string",
+						"defaultValue": "dlseventtriggerdev"
+					},
+					"P_CONTAINER_1": {
+						"type": "string",
+						"defaultValue": "landingzone"
+					}
 				},
 				"variables": {
 					"APAGAR": {
@@ -949,9 +1478,9 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"parameters": {
-					"P_DLS_DFS_URL": {
+					"P_STORAGE_ACCOUNT": {
 						"type": "string",
-						"defaultValue": "https://dlseventtriggerdev.dfs.core.windows.net/"
+						"defaultValue": "dlseventtriggerdev"
 					}
 				},
 				"annotations": [],

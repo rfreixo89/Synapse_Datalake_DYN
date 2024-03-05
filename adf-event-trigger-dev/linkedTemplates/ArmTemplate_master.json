@@ -18,7 +18,7 @@
 		},
 		"LS_DLS_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "@{linkedService().P_DLS_DFS_URL}"
+			"defaultValue": "@{concat('https://',\nlinkedService().P_STORAGE_ACCOUNT,\n'.dfs.core.windows.net')}"
 		},
 		"containerUri": {
 			"type": "string",
