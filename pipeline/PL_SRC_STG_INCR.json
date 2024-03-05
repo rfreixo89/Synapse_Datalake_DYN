@@ -95,7 +95,10 @@
 													"value": "@variables('V_PATH')",
 													"type": "Expression"
 												},
-												"P_CONTAINER": "landingzone",
+												"P_CONTAINER": {
+													"value": "@pipeline().parameters.P_CONTAINER_1",
+													"type": "Expression"
+												},
 												"P_FILENAME": {
 													"value": "@variables('V_FILENAME')",
 													"type": "Expression"
@@ -160,7 +163,10 @@
 									"typeProperties": {
 										"notebookPath": "/Workspace/Users/raphaelfreixo@gmail.com/Get_Metadata_raw",
 										"baseParameters": {
-											"P_CONTAINER": "landingzone",
+											"P_CONTAINER": {
+												"value": "@pipeline().parameters.P_CONTAINER_1",
+												"type": "Expression"
+											},
 											"P_PATH": {
 												"value": "@variables('V_PATH')",
 												"type": "Expression"
@@ -173,7 +179,10 @@
 												"value": "@pipeline().parameters.P_WATERMARK_COLUMN",
 												"type": "Expression"
 											},
-											"P_STORAGE_ACCOUNT": "",
+											"P_STORAGE_ACCOUNT": {
+												"value": "@pipeline().parameters.P_STORAGEACCOUNT",
+												"type": "Expression"
+											},
 											"P_ADF_NAME": {
 												"value": "@pipeline().DataFactory",
 												"type": "Expression"
@@ -252,6 +261,22 @@
 											},
 											"P_COPYDURATION_SEG": {
 												"value": "@activity('CP_MSSQL_INCREMENTAL').output",
+												"type": "Expression"
+											},
+											"P_TABLENAME": {
+												"value": "@pipeline().parameters.P_TABLENAME",
+												"type": "Expression"
+											},
+											"P_SERVER_NAME": {
+												"value": "@pipeline().parameters.P_SERVER",
+												"type": "Expression"
+											},
+											"P_SCHEMA_NAME": {
+												"value": "@pipeline().parameters.P_SCHEMA",
+												"type": "Expression"
+											},
+											"P_APPLICATION": {
+												"value": "@pipeline().parameters.P_APPLICATION",
 												"type": "Expression"
 											}
 										}
@@ -435,6 +460,12 @@
 				"type": "string"
 			},
 			"P_SYSTEM": {
+				"type": "string"
+			},
+			"P_CONTAINER_1": {
+				"type": "string"
+			},
+			"P_STORAGEACCOUNT": {
 				"type": "string"
 			}
 		},

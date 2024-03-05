@@ -214,6 +214,10 @@
 														"P_SYSTEM": {
 															"value": "@item().SYSTEM",
 															"type": "Expression"
+														},
+														"P_STORAGEACCOUNT": {
+															"value": "@pipeline().parameters.P_STORAGEACCOUNT",
+															"type": "Expression"
 														}
 													}
 												}
@@ -243,6 +247,16 @@
 				}
 			}
 		],
+		"parameters": {
+			"P_STORAGEACCOUNT": {
+				"type": "string",
+				"defaultValue": "dlseventtriggerdev"
+			},
+			"P_CONTAINER_1": {
+				"type": "string",
+				"defaultValue": "landingzone"
+			}
+		},
 		"variables": {
 			"APAGAR": {
 				"type": "String"
