@@ -150,7 +150,7 @@
 												"userProperties": [],
 												"typeProperties": {
 													"pipeline": {
-														"referenceName": "01_PL_SRC_STG_LOAD_MSSQL",
+														"referenceName": "01_PL_SRC_LDZ_LOAD_MSSQL",
 														"type": "PipelineReference"
 													},
 													"waitOnCompletion": true,
