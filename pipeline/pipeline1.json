@@ -86,7 +86,7 @@
 										"type": "Expression"
 									},
 									"P_LOAD_TYPE": {
-										"value": "@item().LOAD_TIME",
+										"value": "@item().LOAD_TYPE",
 										"type": "Expression"
 									},
 									"P_WATERMARK": {

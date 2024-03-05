@@ -65,7 +65,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME FROM [',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME\n   \n)",
+							"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME FROM [',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    ']'\n   \n)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
