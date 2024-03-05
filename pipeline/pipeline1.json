@@ -163,8 +163,8 @@
 															"value": "@item().SERVER",
 															"type": "Expression"
 														},
-														"P_SYSTEM": {
-															"value": "@item().SYSTEM",
+														"P_APPLICATION": {
+															"value": "@item().APPLICATION",
 															"type": "Expression"
 														},
 														"P_SCHEMA": {
@@ -209,6 +209,10 @@
 														},
 														"P_WATERMARK_COLUMN": {
 															"value": "@item().WATERMARK_COLUMN",
+															"type": "Expression"
+														},
+														"P_SYSTEM": {
+															"value": "@item().SYSTEM",
 															"type": "Expression"
 														}
 													}

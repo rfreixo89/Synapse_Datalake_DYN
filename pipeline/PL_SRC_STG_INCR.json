@@ -45,7 +45,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME FROM [',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    '] WHERE ',\n    pipeline().parameters.P_WATERMARK_COLUMN,\n    ' > ',\n    '''',\n    pipeline().parameters.P_WATERMARK,\n    ''''\n)\n",
+												"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME FROM [',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    '] WHERE ',\n    pipeline().parameters.P_WATERMARK_COLUMN,\n    ' > ',\n    '''',\n    pipeline().parameters.P_WATERMARK,\n    ''''\n)",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -173,7 +173,87 @@
 												"value": "@pipeline().parameters.P_WATERMARK_COLUMN",
 												"type": "Expression"
 											},
-											"P_STORAGE_ACCOUNT": "dlseventtriggerdev"
+											"P_STORAGE_ACCOUNT": "",
+											"P_ADF_NAME": {
+												"value": "@pipeline().DataFactory",
+												"type": "Expression"
+											},
+											"P_PL_NAME": {
+												"value": "@pipeline().Pipeline",
+												"type": "Expression"
+											},
+											"P_PL_GROUP_ID": {
+												"value": "@pipeline().GroupId",
+												"type": "Expression"
+											},
+											"P_PL_ID": {
+												"value": "@pipeline().GroupId",
+												"type": "Expression"
+											},
+											"P_TRG_ID": {
+												"value": "@pipeline().TriggerId",
+												"type": "Expression"
+											},
+											"P_TRG_NAME": {
+												"value": "@pipeline().TriggerName",
+												"type": "Expression"
+											},
+											"P_TRG_TYPE": {
+												"value": "@pipeline().TriggerType",
+												"type": "Expression"
+											},
+											"P_TRG_TIME": {
+												"value": "@pipeline().TriggerTime",
+												"type": "Expression"
+											},
+											"P_TRG_PL_NAME": {
+												"value": "@pipeline()?.TriggeredByPipelineName",
+												"type": "Expression"
+											},
+											"P_TRG_PL_ID": {
+												"value": "@pipeline()?.TriggeredByPipelineRunId",
+												"type": "Expression"
+											},
+											"P_DATAREAD_KB": {
+												"value": "@activity('CP_MSSQL_INCREMENTAL').output.dataRead",
+												"type": "Expression"
+											},
+											"P_DATAWRITTEN_KB": {
+												"value": "@activity('CP_MSSQL_INCREMENTAL').output",
+												"type": "Expression"
+											},
+											"P_DURATION_ACT_SEG": {
+												"value": "@activity('CP_MSSQL_INCREMENTAL').output",
+												"type": "Expression"
+											},
+											"P_ROWSCOPIED_UNIT": {
+												"value": "@activity('CP_MSSQL_INCREMENTAL').output",
+												"type": "Expression"
+											},
+											"P_ROWSREAD_UNIT": {
+												"value": "@activity('CP_MSSQL_INCREMENTAL').output",
+												"type": "Expression"
+											},
+											"P_START_TIME": {
+												"value": "@activity('CP_MSSQL_INCREMENTAL').output",
+												"type": "Expression"
+											},
+											"P_STATUS": {
+												"value": "@activity('CP_MSSQL_INCREMENTAL').output",
+												"type": "Expression"
+											},
+											"P_THROUGHTPUT_MB": {
+												"value": "@activity('CP_MSSQL_INCREMENTAL').output",
+												"type": "Expression"
+											},
+											"P_LOAD_TYPE": {
+												"value": "@pipeline().parameters.P_LOAD_TYPE",
+												"type": "Expression"
+											},
+											"P_COPYDURATION_SEG": {
+												"value": "@activity('CP_MSSQL_INCREMENTAL').output",
+												"type": "Expression"
+											}
 										}
 									},
 									"linkedServiceName": {
@@ -214,7 +294,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "@concat('SELECT ',\n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME  FROM ',\n    pipeline().parameters.P_SYSTEM,\n    '.',\n    pipeline().parameters.P_SCHEMA,\n    '.',\n    pipeline().parameters.P_TABLENAME\n   \n)\n",
+										"value": "@concat('SELECT ',\n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME  FROM ',\n    pipeline().parameters.P_SYSTEM,\n    '.',\n    pipeline().parameters.P_SCHEMA,\n    '.',\n    pipeline().parameters.P_TABLENAME\n   \n)",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -318,7 +398,7 @@
 			"P_SERVER": {
 				"type": "string"
 			},
-			"P_SYSTEM": {
+			"P_APPLICATION": {
 				"type": "string"
 			},
 			"P_SCHEMA": {
@@ -352,6 +432,9 @@
 				"type": "string"
 			},
 			"P_WATERMARK_COLUMN": {
+				"type": "string"
+			},
+			"P_SYSTEM": {
 				"type": "string"
 			}
 		},
