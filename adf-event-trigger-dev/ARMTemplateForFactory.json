@@ -444,6 +444,9 @@
 						"type": "String"
 					}
 				},
+				"folder": {
+					"name": "DATALAKE DYN/MSSQL/DYNAMICS PIPES"
+				},
 				"annotations": [],
 				"lastPublishTime": "2024-03-02T02:42:13Z"
 			},
@@ -1546,6 +1549,9 @@
 						"type": "String"
 					}
 				},
+				"folder": {
+					"name": "DATALAKE DYN/MSSQL/DYNAMICS PIPES"
+				},
 				"annotations": [],
 				"lastPublishTime": "2024-03-02T02:42:13Z"
 			},
@@ -1854,12 +1860,200 @@
 						"type": "String"
 					}
 				},
+				"folder": {
+					"name": "DATALAKE DYN/MSSQL/DYNAMICS PIPES"
+				},
 				"annotations": [],
 				"lastPublishTime": "2024-03-02T02:42:13Z"
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/01_02_PL_SRC_LDZ_FULL_MSSQL')]",
 				"[concat(variables('factoryId'), '/pipelines/01_02_PL_SRC_LDZ_INCR_MSSQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OR_PL_MSSQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "LKUP_CONTROL_TABLE",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DT_SRC_MSSQL",
+								"type": "DatasetReference",
+								"parameters": {
+									"P_TABLENAME": "CONTROL_TABLE",
+									"P_SCHEMA": "dbo"
+								}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "LKUP_CONTROL_TABLE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('LKUP_CONTROL_TABLE').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "01_PL_SRC_LDZ_LOAD_MSSQL",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "01_PL_SRC_LDZ_LOAD_MSSQL",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"P_TECH": {
+												"value": "@item().TECH\n",
+												"type": "Expression"
+											},
+											"P_SERVER": {
+												"value": "@item().SERVER",
+												"type": "Expression"
+											},
+											"P_APPLICATION": {
+												"value": "@item().APPLICATION",
+												"type": "Expression"
+											},
+											"P_SCHEMA": {
+												"value": "@item().SCHEMA",
+												"type": "Expression"
+											},
+											"P_TABLENAME": {
+												"value": "@item().TABLENAME",
+												"type": "Expression"
+											},
+											"P_LOAD_TYPE": {
+												"value": "@item().LOAD_TYPE",
+												"type": "Expression"
+											},
+											"P_WATERMARK": {
+												"value": "@item().WATERMARK",
+												"type": "Expression"
+											},
+											"P_CHK_BIG_NUMBER": {
+												"value": "@item().CHK_BIG_NUMBER",
+												"type": "Expression"
+											},
+											"P_ACTIVE": {
+												"value": "@item().ACTIVE",
+												"type": "Expression"
+											},
+											"P_SENSITIVE_DATA": {
+												"value": "@item().SENSITIVE_DATA",
+												"type": "Expression"
+											},
+											"P_SELECT_COLUMN": {
+												"value": "@item().SELECT_COLUMN",
+												"type": "Expression"
+											},
+											"P_SELECT_COLUMN_MAX": {
+												"value": "@item().SELECT_COLUMN_MAX",
+												"type": "Expression"
+											},
+											"P_PATH": {
+												"value": "@item().PATH\n",
+												"type": "Expression"
+											},
+											"P_WATERMARK_COLUMN": {
+												"value": "@item().WATERMARK_COLUMN",
+												"type": "Expression"
+											},
+											"P_SYSTEM": {
+												"value": "@item().SYSTEM",
+												"type": "Expression"
+											},
+											"P_CONTAINER_1": {
+												"value": "@pipeline().parameters.P_CONTAINER_1",
+												"type": "Expression"
+											},
+											"P_STORAGEACCOUNT": {
+												"value": "@pipeline().parameters.P_STORAGEACCOUNT",
+												"type": "Expression"
+											},
+											"P_PROJECT_NAME": {
+												"value": "@item().PROJECT_NAME",
+												"type": "Expression"
+											},
+											"P_DATA_DOMAIN": {
+												"value": "@item().DATA_DOMAIN",
+												"type": "Expression"
+											},
+											"P_FULL_LOAD_FLAG": {
+												"value": "@item().FULL_LOAD_FLAG",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"P_STORAGEACCOUNT": {
+						"type": "string",
+						"defaultValue": "dlseventtriggerdev"
+					},
+					"P_CONTAINER_1": {
+						"type": "string",
+						"defaultValue": "landingzone"
+					}
+				},
+				"variables": {
+					"APAGAR": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "DATALAKE DYN/ORCHESTRATION"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-03-02T02:27:23Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DT_SRC_MSSQL')]",
+				"[concat(variables('factoryId'), '/pipelines/01_PL_SRC_LDZ_LOAD_MSSQL')]"
 			]
 		},
 		{
@@ -2106,195 +2300,13 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "DATALAKE DYN/LOGS"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "LKUP_CONTROL_TABLE",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DT_SRC_MSSQL",
-								"type": "DatasetReference",
-								"parameters": {
-									"P_TABLENAME": "CONTROL_TABLE",
-									"P_SCHEMA": "dbo"
-								}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "LKUP_CONTROL_TABLE",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('LKUP_CONTROL_TABLE').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"activities": [
-								{
-									"name": "01_PL_SRC_LDZ_LOAD_MSSQL",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "01_PL_SRC_LDZ_LOAD_MSSQL",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"P_TECH": {
-												"value": "@item().TECH\n",
-												"type": "Expression"
-											},
-											"P_SERVER": {
-												"value": "@item().SERVER",
-												"type": "Expression"
-											},
-											"P_APPLICATION": {
-												"value": "@item().APPLICATION",
-												"type": "Expression"
-											},
-											"P_SCHEMA": {
-												"value": "@item().SCHEMA",
-												"type": "Expression"
-											},
-											"P_TABLENAME": {
-												"value": "@item().TABLENAME",
-												"type": "Expression"
-											},
-											"P_LOAD_TYPE": {
-												"value": "@item().LOAD_TYPE",
-												"type": "Expression"
-											},
-											"P_WATERMARK": {
-												"value": "@item().WATERMARK",
-												"type": "Expression"
-											},
-											"P_CHK_BIG_NUMBER": {
-												"value": "@item().CHK_BIG_NUMBER",
-												"type": "Expression"
-											},
-											"P_ACTIVE": {
-												"value": "@item().ACTIVE",
-												"type": "Expression"
-											},
-											"P_SENSITIVE_DATA": {
-												"value": "@item().SENSITIVE_DATA",
-												"type": "Expression"
-											},
-											"P_SELECT_COLUMN": {
-												"value": "@item().SELECT_COLUMN",
-												"type": "Expression"
-											},
-											"P_SELECT_COLUMN_MAX": {
-												"value": "@item().SELECT_COLUMN_MAX",
-												"type": "Expression"
-											},
-											"P_PATH": {
-												"value": "@item().PATH\n",
-												"type": "Expression"
-											},
-											"P_WATERMARK_COLUMN": {
-												"value": "@item().WATERMARK_COLUMN",
-												"type": "Expression"
-											},
-											"P_SYSTEM": {
-												"value": "@item().SYSTEM",
-												"type": "Expression"
-											},
-											"P_CONTAINER_1": {
-												"value": "@pipeline().parameters.P_CONTAINER_1",
-												"type": "Expression"
-											},
-											"P_STORAGEACCOUNT": {
-												"value": "@pipeline().parameters.P_STORAGEACCOUNT",
-												"type": "Expression"
-											},
-											"P_PROJECT_NAME": {
-												"value": "@item().PROJECT_NAME",
-												"type": "Expression"
-											},
-											"P_DATA_DOMAIN": {
-												"value": "@item().DATA_DOMAIN",
-												"type": "Expression"
-											},
-											"P_FULL_LOAD_FLAG": {
-												"value": "@item().FULL_LOAD_FLAG",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"P_STORAGEACCOUNT": {
-						"type": "string",
-						"defaultValue": "dlseventtriggerdev"
-					},
-					"P_CONTAINER_1": {
-						"type": "string",
-						"defaultValue": "landingzone"
-					}
-				},
-				"variables": {
-					"APAGAR": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "SqlServer/PROCESS"
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-03-02T02:27:23Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DT_SRC_MSSQL')]",
-				"[concat(variables('factoryId'), '/pipelines/01_PL_SRC_LDZ_LOAD_MSSQL')]"
 			]
 		},
 		{

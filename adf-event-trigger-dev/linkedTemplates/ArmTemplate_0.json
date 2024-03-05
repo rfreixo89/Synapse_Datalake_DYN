@@ -327,6 +327,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "DATALAKE DYN/LOGS"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -896,6 +899,9 @@
 					"V_FILENAME": {
 						"type": "String"
 					}
+				},
+				"folder": {
+					"name": "DATALAKE DYN/MSSQL/DYNAMICS PIPES"
 				},
 				"annotations": [],
 				"lastPublishTime": "2024-03-02T02:42:13Z"
@@ -1999,6 +2005,9 @@
 						"type": "String"
 					}
 				},
+				"folder": {
+					"name": "DATALAKE DYN/MSSQL/DYNAMICS PIPES"
+				},
 				"annotations": [],
 				"lastPublishTime": "2024-03-02T02:42:13Z"
 			},
@@ -2307,6 +2316,9 @@
 						"type": "String"
 					}
 				},
+				"folder": {
+					"name": "DATALAKE DYN/MSSQL/DYNAMICS PIPES"
+				},
 				"annotations": [],
 				"lastPublishTime": "2024-03-02T02:42:13Z"
 			},
@@ -2316,7 +2328,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"name": "[concat(parameters('factoryName'), '/OR_PL_MSSQL')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -2490,7 +2502,7 @@
 					}
 				},
 				"folder": {
-					"name": "SqlServer/PROCESS"
+					"name": "DATALAKE DYN/ORCHESTRATION"
 				},
 				"annotations": [],
 				"lastPublishTime": "2024-03-02T02:27:23Z"
