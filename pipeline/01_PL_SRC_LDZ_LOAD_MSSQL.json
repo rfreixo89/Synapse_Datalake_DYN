@@ -45,10 +45,6 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "01_01_PL_SRC_TO_LDZ_FULL_MSSQL",
-									"type": "PipelineReference"
-								},
 								"waitOnCompletion": true
 							}
 						}
