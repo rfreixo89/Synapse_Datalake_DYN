@@ -2,15 +2,15 @@
 	"name": "LS_DLS",
 	"properties": {
 		"parameters": {
-			"P_DLS_DFS_URL": {
+			"P_STORAGE_ACCOUNT": {
 				"type": "string",
-				"defaultValue": "https://dlseventtriggerdev.dfs.core.windows.net/"
+				"defaultValue": "dlseventtriggerdev"
 			}
 		},
 		"annotations": [],
 		"type": "AzureBlobFS",
 		"typeProperties": {
-			"url": "@{linkedService().P_DLS_DFS_URL}"
+			"url": "@{concat('https://',\nlinkedService().P_STORAGE_ACCOUNT,\n'.dfs.core.windows.net')}"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/linkedservices"
