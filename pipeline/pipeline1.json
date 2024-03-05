@@ -51,208 +51,101 @@
 					"isSequential": false,
 					"activities": [
 						{
-							"name": "Switch1",
-							"type": "Switch",
+							"name": "01_PL_SRC_LDZ_LOAD_MSSQL",
+							"type": "ExecutePipeline",
 							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
-								"on": {
-									"value": "@item().TECH",
-									"type": "Expression"
+								"pipeline": {
+									"referenceName": "01_PL_SRC_LDZ_LOAD_MSSQL",
+									"type": "PipelineReference"
 								},
-								"cases": [
-									{
-										"value": "HANA",
-										"activities": [
-											{
-												"name": "Set variable1_copy1",
-												"type": "SetVariable",
-												"dependsOn": [],
-												"policy": {
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"variableName": "APAGAR",
-													"value": "S"
-												}
-											}
-										]
+								"waitOnCompletion": true,
+								"parameters": {
+									"P_TECH": {
+										"value": "@item().TECH\n",
+										"type": "Expression"
 									},
-									{
-										"value": "ORACLE",
-										"activities": [
-											{
-												"name": "Set variable1_copy2",
-												"type": "SetVariable",
-												"dependsOn": [],
-												"policy": {
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"variableName": "APAGAR",
-													"value": "S"
-												}
-											}
-										]
+									"P_SERVER": {
+										"value": "@item().SERVER",
+										"type": "Expression"
 									},
-									{
-										"value": "MYSQL",
-										"activities": [
-											{
-												"name": "Set variable1_copy3",
-												"type": "SetVariable",
-												"dependsOn": [],
-												"policy": {
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"variableName": "APAGAR",
-													"value": "S"
-												}
-											}
-										]
+									"P_APPLICATION": {
+										"value": "@item().APPLICATION",
+										"type": "Expression"
 									},
-									{
-										"value": "POSTGRES",
-										"activities": [
-											{
-												"name": "Set variable1_copy4",
-												"type": "SetVariable",
-												"dependsOn": [],
-												"policy": {
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"variableName": "APAGAR",
-													"value": "S"
-												}
-											}
-										]
+									"P_SCHEMA": {
+										"value": "@item().SCHEMA",
+										"type": "Expression"
 									},
-									{
-										"value": "MSSQL",
-										"activities": [
-											{
-												"name": "PL_SRC_TO_LDZ_MSSQL",
-												"type": "ExecutePipeline",
-												"dependsOn": [],
-												"policy": {
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"pipeline": {
-														"referenceName": "01_PL_SRC_LDZ_LOAD_MSSQL",
-														"type": "PipelineReference"
-													},
-													"waitOnCompletion": true,
-													"parameters": {
-														"P_TECH": {
-															"value": "@item().TECH",
-															"type": "Expression"
-														},
-														"P_SERVER": {
-															"value": "@item().SERVER",
-															"type": "Expression"
-														},
-														"P_APPLICATION": {
-															"value": "@item().APPLICATION",
-															"type": "Expression"
-														},
-														"P_SCHEMA": {
-															"value": "@item().SCHEMA",
-															"type": "Expression"
-														},
-														"P_TABLENAME": {
-															"value": "@item().TABLENAME",
-															"type": "Expression"
-														},
-														"P_LOAD_TYPE": {
-															"value": "@item().LOAD_TYPE",
-															"type": "Expression"
-														},
-														"P_WATERMARK": {
-															"value": "@item().WATERMARK",
-															"type": "Expression"
-														},
-														"P_CHK_BIG_NUMBER": {
-															"value": "@item().CHK_BIG_NUMBER",
-															"type": "Expression"
-														},
-														"P_ACTIVE": {
-															"value": "@item().ACTIVE",
-															"type": "Expression"
-														},
-														"P_SENSITIVE_DATA": {
-															"value": "@item().SENSITIVE_DATA",
-															"type": "Expression"
-														},
-														"P_SELECT_COLUMN": {
-															"value": "@item().SELECT_COLUMN",
-															"type": "Expression"
-														},
-														"P_SELECT_COLUMN_MAX": {
-															"value": "@item().SELECT_COLUMN_MAX",
-															"type": "Expression"
-														},
-														"P_PATH": {
-															"value": "@item().PATH",
-															"type": "Expression"
-														},
-														"P_WATERMARK_COLUMN": {
-															"value": "@item().WATERMARK_COLUMN",
-															"type": "Expression"
-														},
-														"P_SYSTEM": {
-															"value": "@item().SYSTEM",
-															"type": "Expression"
-														},
-														"P_CONTAINER_1": {
-															"value": "@pipeline().parameters.P_CONTAINER_1",
-															"type": "Expression"
-														},
-														"P_STORAGEACCOUNT": {
-															"value": "@pipeline().parameters.P_STORAGEACCOUNT",
-															"type": "Expression"
-														},
-														"P_PROJECT_NAME": {
-															"value": "@item().PROJECT_NAME",
-															"type": "Expression"
-														},
-														"P_DATA_DOMAIN": {
-															"value": "@item().DATA_DOMAIN",
-															"type": "Expression"
-														}
-													}
-												}
-											}
-										]
+									"P_TABLENAME": {
+										"value": "@item().TABLENAME",
+										"type": "Expression"
+									},
+									"P_LOAD_TYPE": {
+										"value": "@item().LOAD_TIME",
+										"type": "Expression"
+									},
+									"P_WATERMARK": {
+										"value": "@item().WATERMARK",
+										"type": "Expression"
+									},
+									"P_CHK_BIG_NUMBER": {
+										"value": "@item().CHK_BIG_NUMBER",
+										"type": "Expression"
+									},
+									"P_ACTIVE": {
+										"value": "@item().ACTIVE",
+										"type": "Expression"
+									},
+									"P_SENSITIVE_DATA": {
+										"value": "@item().SENSITIVE_DATA",
+										"type": "Expression"
+									},
+									"P_SELECT_COLUMN": {
+										"value": "@item().SELECT_COLUMN",
+										"type": "Expression"
+									},
+									"P_SELECT_COLUMN_MAX": {
+										"value": "@item().SELECT_COLUMN_MAX",
+										"type": "Expression"
+									},
+									"P_PATH": {
+										"value": "@item().PATH\n",
+										"type": "Expression"
+									},
+									"P_WATERMARK_COLUMN": {
+										"value": "@item().WATERMARK_COLUMN",
+										"type": "Expression"
+									},
+									"P_SYSTEM": {
+										"value": "@item().SYSTEM",
+										"type": "Expression"
+									},
+									"P_CONTAINER_1": {
+										"value": "@pipeline().parameters.P_CONTAINER_1",
+										"type": "Expression"
+									},
+									"P_STORAGEACCOUNT": {
+										"value": "@pipeline().parameters.P_STORAGEACCOUNT",
+										"type": "Expression"
+									},
+									"P_PROJECT_NAME": {
+										"value": "@item().PROJECT_NAME",
+										"type": "Expression"
+									},
+									"P_DATA_DOMAIN": {
+										"value": "@item().DATA_DOMAIN",
+										"type": "Expression"
+									},
+									"P_FULL_LOAD_FLAG": {
+										"value": "@item().FULL_LOAD_FLAG",
+										"type": "Expression"
 									}
-								],
-								"defaultActivities": [
-									{
-										"name": "Set variable1",
-										"type": "SetVariable",
-										"dependsOn": [],
-										"policy": {
-											"secureOutput": false,
-											"secureInput": false
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"variableName": "APAGAR",
-											"value": "S"
-										}
-									}
-								]
+								}
 							}
 						}
 					]
