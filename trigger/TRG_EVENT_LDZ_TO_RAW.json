@@ -17,8 +17,8 @@
 		],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
-			"blobPathBeginsWith": "/landingzone/blobs/SALES/EY_DL_DYN/SALESFORCES/SALESORDERDETAIL_SALES_DETAILS/",
-			"blobPathEndsWith": "*.parquet",
+			"blobPathBeginsWith": "/landingzone/blobs/SALES/EY_DL_DYN/SALESFORCES/",
+			"blobPathEndsWith": ".parquet",
 			"ignoreEmptyBlobs": true,
 			"scope": "/subscriptions/2bfc44c5-aef6-403f-bd57-d339da205622/resourceGroups/DL-Event-Trigger-dev/providers/Microsoft.Storage/storageAccounts/dlseventtriggerdev",
 			"events": [
