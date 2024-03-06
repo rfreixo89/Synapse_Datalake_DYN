@@ -1,0 +1,29 @@
+{
+	"name": "TRG_EVENT_LDZ_TO_RAW",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_EVENT_LDZ_RAW",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"P_PATH": "@triggerBody().folderPath",
+					"P_FILENAME": "@triggerBody().fileName"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/landingzone/blobs/SALES/EY_DL_DYN/*",
+			"blobPathEndsWith": "*.parquet",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/2bfc44c5-aef6-403f-bd57-d339da205622/resourceGroups/DL-Event-Trigger-dev/providers/Microsoft.Storage/storageAccounts/dlseventtriggerdev",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

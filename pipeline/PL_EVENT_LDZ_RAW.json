@@ -1,0 +1,58 @@
+{
+	"name": "PL_EVENT_LDZ_RAW",
+	"properties": {
+		"activities": [
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_apagar",
+					"value": {
+						"value": "@pipeline().parameters.P_FILENAME",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set variable2",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_apagar2",
+					"value": {
+						"value": "@pipeline().parameters.P_PATH",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"P_PATH": {
+				"type": "string"
+			},
+			"P_FILENAME": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"v_apagar": {
+				"type": "String"
+			},
+			"v_apagar2": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
