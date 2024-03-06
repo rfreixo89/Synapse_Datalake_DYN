@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "NB_COPY_LOGS",
+				"name": "NB_COPY_LOGS_SUCCEDED_copy1",
 				"type": "DatabricksNotebook",
 				"dependsOn": [],
 				"policy": {
@@ -136,6 +136,14 @@
 						"P_DATA_DOMAIN": {
 							"value": "@pipeline().parameters.P_DATA_DOMAIN",
 							"type": "Expression"
+						},
+						"P_CODE_ERROR": {
+							"value": "@pipeline().parameters.P_CODE_ERROR",
+							"type": "Expression"
+						},
+						"P_MSG_ERROR": {
+							"value": "@pipeline().parameters.P_MSG_ERROR",
+							"type": "Expression"
 						}
 					}
 				},
@@ -234,6 +242,12 @@
 				"type": "string"
 			},
 			"P_DATA_DOMAIN": {
+				"type": "string"
+			},
+			"P_CODE_ERROR": {
+				"type": "string"
+			},
+			"P_MSG_ERROR": {
 				"type": "string"
 			}
 		},

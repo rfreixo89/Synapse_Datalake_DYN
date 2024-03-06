@@ -18,13 +18,13 @@
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "V_FILENAME_MSSQL_INCR_copy1_copy1",
+									"activity": "V_FILENAME_MSSQL_INCR_FALSE",
 									"dependencyConditions": [
 										"Succeeded"
 									]
 								},
 								{
-									"activity": "V_PATH_MSSQL_INCR_copy1_copy1",
+									"activity": "V_PATH_MSSQL_INCR_FALSE",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -42,7 +42,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME FROM [',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    ']'\n   \n)",
+										"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME FROM [11',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    ']',\n    ' where ',\n    pipeline().parameters.P_WATERMARK_COLUMN,\n    ' >= ' ,\n    ''' pipeline().parameters.P_WATERMARK  '''\n   \n)",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -105,7 +105,7 @@
 							]
 						},
 						{
-							"name": "NB_GET_WATERMARK_LOGS_RAW_false",
+							"name": "NB_GET_WATERMARK_LOGS_RAW_FALSE",
 							"type": "DatabricksNotebook",
 							"dependsOn": [
 								{
@@ -174,7 +174,7 @@
 							}
 						},
 						{
-							"name": "PL_CP_ACT_RAW_copy1_copy1",
+							"name": "PL_CP_ACT_RAW_FALSE",
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
@@ -284,11 +284,11 @@
 										"type": "Expression"
 									},
 									"P_ROWSCOPIED_UNIT": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.rowsCopied",
+										"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.executionDetails[0].status, 'Failed'), '0', activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.rowsCopied)\n",
 										"type": "Expression"
 									},
 									"P_ROWSREAD_UNIT": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.rowsRead",
+										"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.executionDetails[0].status, 'Failed'), '0', activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.rowsRead)\n\n",
 										"type": "Expression"
 									},
 									"P_STATUS": {
@@ -314,16 +314,24 @@
 									"P_DATA_DOMAIN": {
 										"value": "@pipeline().parameters.P_DATA_DOMAIN",
 										"type": "Expression"
+									},
+									"P_CODE_ERROR": {
+										"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.executionDetails[0].status, 'Failed'), string(activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.errors[0].Code), '--')\n\n",
+										"type": "Expression"
+									},
+									"P_MSG_ERROR": {
+										"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.executionDetails[0].status, 'Failed'), activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.errors[0].Message, '--')\n",
+										"type": "Expression"
 									}
 								}
 							}
 						},
 						{
-							"name": "SCR_UPDATE_WATERMARK_FLAG_TRUE",
+							"name": "SCR_UPDATE_WATERMARK_FLAG_FALSE",
 							"type": "Script",
 							"dependsOn": [
 								{
-									"activity": "NB_GET_WATERMARK_LOGS_RAW_false",
+									"activity": "NB_GET_WATERMARK_LOGS_RAW_FALSE",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -407,7 +415,7 @@
 							"type": "Script",
 							"dependsOn": [
 								{
-									"activity": "SCR_UPDATE_WATERMARK_FLAG_TRUE",
+									"activity": "SCR_UPDATE_WATERMARK_FLAG_FALSE",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -478,7 +486,7 @@
 							}
 						},
 						{
-							"name": "V_FILENAME_MSSQL_INCR_copy1_copy1",
+							"name": "V_FILENAME_MSSQL_INCR_FALSE",
 							"type": "SetVariable",
 							"dependsOn": [],
 							"policy": {
@@ -495,7 +503,7 @@
 							}
 						},
 						{
-							"name": "V_PATH_MSSQL_INCR_copy1_copy1",
+							"name": "V_PATH_MSSQL_INCR_FALSE",
 							"type": "SetVariable",
 							"dependsOn": [],
 							"policy": {
@@ -518,13 +526,13 @@
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "V_FILENAME_MSSQL_INCR_copy1",
+									"activity": "V_FILENAME_MSSQL_INCR_TRUE",
 									"dependencyConditions": [
 										"Succeeded"
 									]
 								},
 								{
-									"activity": "V_PATH_MSSQL_INCR_copy1",
+									"activity": "V_PATH_MSSQL_INCR_TRUE",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -611,7 +619,7 @@
 								{
 									"activity": "CP_MSSQL_INCREMENTAL_FLAG_TRUE",
 									"dependencyConditions": [
-										"Completed"
+										"Succeeded"
 									]
 								}
 							],
@@ -674,13 +682,13 @@
 							}
 						},
 						{
-							"name": "PL_CP_ACT_RAW_copy1",
+							"name": "PL_CP_ACT_RAW_TRUE",
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
 									"activity": "CP_MSSQL_INCREMENTAL_FLAG_TRUE",
 									"dependencyConditions": [
-										"Succeeded"
+										"Completed"
 									]
 								}
 							],
@@ -784,11 +792,11 @@
 										"type": "Expression"
 									},
 									"P_ROWSCOPIED_UNIT": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.rowsCopied",
+										"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.executionDetails[0].status, 'Failed'), '0', activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.rowsCopied)",
 										"type": "Expression"
 									},
 									"P_ROWSREAD_UNIT": {
-										"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.rowsRead",
+										"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.executionDetails[0].status, 'Failed'), '0', activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.rowsRead)",
 										"type": "Expression"
 									},
 									"P_STATUS": {
@@ -813,6 +821,14 @@
 									},
 									"P_DATA_DOMAIN": {
 										"value": "@pipeline().parameters.P_DATA_DOMAIN",
+										"type": "Expression"
+									},
+									"P_CODE_ERROR": {
+										"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.executionDetails[0].status, 'Failed'), string(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.errors[0].Code), '--')\n",
+										"type": "Expression"
+									},
+									"P_MSG_ERROR": {
+										"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.executionDetails[0].status, 'Failed'), string(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.errors[0].Message), '--')\n",
 										"type": "Expression"
 									}
 								}
@@ -978,7 +994,7 @@
 							}
 						},
 						{
-							"name": "V_FILENAME_MSSQL_INCR_copy1",
+							"name": "V_FILENAME_MSSQL_INCR_TRUE",
 							"type": "SetVariable",
 							"dependsOn": [],
 							"policy": {
@@ -995,7 +1011,7 @@
 							}
 						},
 						{
-							"name": "V_PATH_MSSQL_INCR_copy1",
+							"name": "V_PATH_MSSQL_INCR_TRUE",
 							"type": "SetVariable",
 							"dependsOn": [],
 							"policy": {
