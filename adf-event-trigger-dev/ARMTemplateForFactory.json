@@ -2640,8 +2640,8 @@
 				],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/landingzone/blobs/SALES/EY_DL_DYN/*",
-					"blobPathEndsWith": "*.parquet",
+					"blobPathBeginsWith": "/landingzone/blobs/SALES/EY_DL_DYN/SALESFORCES/",
+					"blobPathEndsWith": ".parquet",
 					"ignoreEmptyBlobs": true,
 					"scope": "[parameters('TRG_EVENT_LDZ_TO_RAW_properties_typeProperties_scope')]",
 					"events": [
