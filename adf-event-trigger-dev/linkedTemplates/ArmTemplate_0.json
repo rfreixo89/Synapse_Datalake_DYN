@@ -19,12 +19,88 @@
 		"LS_DLS_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{concat('https://',\nlinkedService().P_STORAGE_ACCOUNT,\n'.dfs.core.windows.net')}"
+		},
+		"TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_PATH": {
+			"type": "string",
+			"defaultValue": "@triggerBody().folderPath"
+		},
+		"TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_FILENAME": {
+			"type": "string",
+			"defaultValue": "@triggerBody().fileName"
+		},
+		"TRG_EVENT_LDZ_TO_RAW_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/2bfc44c5-aef6-403f-bd57-d339da205622/resourceGroups/DL-Event-Trigger-dev/providers/Microsoft.Storage/storageAccounts/dlseventtriggerdev"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_EVENT_LDZ_RAW')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "v_apagar",
+							"value": {
+								"value": "@pipeline().parameters.P_FILENAME",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set variable2",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "v_apagar2",
+							"value": {
+								"value": "@pipeline().parameters.P_PATH",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"P_PATH": {
+						"type": "string"
+					},
+					"P_FILENAME": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"v_apagar": {
+						"type": "String"
+					},
+					"v_apagar2": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureDatabricks1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -90,7 +166,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "NB_COPY_LOGS",
+						"name": "NB_COPY_LOGS_SUCCEDED_copy1",
 						"type": "DatabricksNotebook",
 						"dependsOn": [],
 						"policy": {
@@ -223,6 +299,14 @@
 								"P_DATA_DOMAIN": {
 									"value": "@pipeline().parameters.P_DATA_DOMAIN",
 									"type": "Expression"
+								},
+								"P_CODE_ERROR": {
+									"value": "@pipeline().parameters.P_CODE_ERROR",
+									"type": "Expression"
+								},
+								"P_MSG_ERROR": {
+									"value": "@pipeline().parameters.P_MSG_ERROR",
+									"type": "Expression"
 								}
 							}
 						},
@@ -324,6 +408,12 @@
 						"type": "string"
 					},
 					"P_DATA_DOMAIN": {
+						"type": "string"
+					},
+					"P_CODE_ERROR": {
+						"type": "string"
+					},
+					"P_MSG_ERROR": {
 						"type": "string"
 					}
 				},
@@ -479,6 +569,40 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_SQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TRG_EVENT_LDZ_TO_RAW')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "PL_EVENT_LDZ_RAW",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"P_PATH": "[parameters('TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_PATH')]",
+							"P_FILENAME": "[parameters('TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_FILENAME')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/landingzone/blobs/SALES/EY_DL_DYN/*",
+					"blobPathEndsWith": "*.parquet",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('TRG_EVENT_LDZ_TO_RAW_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/PL_EVENT_LDZ_RAW')]"
 			]
 		},
 		{
@@ -935,13 +1059,13 @@
 									"type": "Copy",
 									"dependsOn": [
 										{
-											"activity": "V_FILENAME_MSSQL_INCR_copy1_copy1",
+											"activity": "V_FILENAME_MSSQL_INCR_FALSE",
 											"dependencyConditions": [
 												"Succeeded"
 											]
 										},
 										{
-											"activity": "V_PATH_MSSQL_INCR_copy1_copy1",
+											"activity": "V_PATH_MSSQL_INCR_FALSE",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -959,7 +1083,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME FROM [',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    ']'\n   \n)",
+												"value": "@concat('SELECT ',    \n    pipeline().parameters.P_SELECT_COLUMN,\n    ',GETUTCDATE() _LOAD_TIME FROM [11',\n    \n    pipeline().parameters.P_SYSTEM,\n    '].[',\n    pipeline().parameters.P_SCHEMA,\n    '].[',\n    pipeline().parameters.P_TABLENAME,\n    ']',\n    ' where ',\n    pipeline().parameters.P_WATERMARK_COLUMN,\n    ' >= ' ,\n    '''',\n     pipeline().parameters.P_WATERMARK,\n       ''''\n   \n)",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -1022,7 +1146,7 @@
 									]
 								},
 								{
-									"name": "NB_GET_WATERMARK_LOGS_RAW_false",
+									"name": "NB_GET_WATERMARK_LOGS_RAW_FALSE",
 									"type": "DatabricksNotebook",
 									"dependsOn": [
 										{
@@ -1091,7 +1215,7 @@
 									}
 								},
 								{
-									"name": "PL_CP_ACT_RAW_copy1_copy1",
+									"name": "PL_CP_ACT_RAW_FALSE",
 									"type": "ExecutePipeline",
 									"dependsOn": [
 										{
@@ -1201,11 +1325,11 @@
 												"type": "Expression"
 											},
 											"P_ROWSCOPIED_UNIT": {
-												"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.rowsCopied",
+												"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.executionDetails[0].status, 'Failed'), '0', activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.rowsCopied)\n",
 												"type": "Expression"
 											},
 											"P_ROWSREAD_UNIT": {
-												"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.rowsRead",
+												"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.executionDetails[0].status, 'Failed'), '0', activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.rowsRead)\n\n",
 												"type": "Expression"
 											},
 											"P_STATUS": {
@@ -1231,16 +1355,24 @@
 											"P_DATA_DOMAIN": {
 												"value": "@pipeline().parameters.P_DATA_DOMAIN",
 												"type": "Expression"
+											},
+											"P_CODE_ERROR": {
+												"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.executionDetails[0].status, 'Failed'), string(activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.errors[0].Code), '--')\n\n",
+												"type": "Expression"
+											},
+											"P_MSG_ERROR": {
+												"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.executionDetails[0].status, 'Failed'), activity('CP_MSSQL_INCREMENTAL_FLAG_FALSE').output.errors[0].Message, '--')\n",
+												"type": "Expression"
 											}
 										}
 									}
 								},
 								{
-									"name": "SCR_UPDATE_WATERMARK_FLAG_TRUE",
+									"name": "SCR_UPDATE_WATERMARK_FLAG_FALSE",
 									"type": "Script",
 									"dependsOn": [
 										{
-											"activity": "NB_GET_WATERMARK_LOGS_RAW_false",
+											"activity": "NB_GET_WATERMARK_LOGS_RAW_FALSE",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -1324,7 +1456,7 @@
 									"type": "Script",
 									"dependsOn": [
 										{
-											"activity": "SCR_UPDATE_WATERMARK_FLAG_TRUE",
+											"activity": "SCR_UPDATE_WATERMARK_FLAG_FALSE",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -1395,7 +1527,7 @@
 									}
 								},
 								{
-									"name": "V_FILENAME_MSSQL_INCR_copy1_copy1",
+									"name": "V_FILENAME_MSSQL_INCR_FALSE",
 									"type": "SetVariable",
 									"dependsOn": [],
 									"policy": {
@@ -1412,7 +1544,7 @@
 									}
 								},
 								{
-									"name": "V_PATH_MSSQL_INCR_copy1_copy1",
+									"name": "V_PATH_MSSQL_INCR_FALSE",
 									"type": "SetVariable",
 									"dependsOn": [],
 									"policy": {
@@ -1435,13 +1567,13 @@
 									"type": "Copy",
 									"dependsOn": [
 										{
-											"activity": "V_FILENAME_MSSQL_INCR_copy1",
+											"activity": "V_FILENAME_MSSQL_INCR_TRUE",
 											"dependencyConditions": [
 												"Succeeded"
 											]
 										},
 										{
-											"activity": "V_PATH_MSSQL_INCR_copy1",
+											"activity": "V_PATH_MSSQL_INCR_TRUE",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -1528,7 +1660,7 @@
 										{
 											"activity": "CP_MSSQL_INCREMENTAL_FLAG_TRUE",
 											"dependencyConditions": [
-												"Completed"
+												"Succeeded"
 											]
 										}
 									],
@@ -1591,13 +1723,13 @@
 									}
 								},
 								{
-									"name": "PL_CP_ACT_RAW_copy1",
+									"name": "PL_CP_ACT_RAW_TRUE",
 									"type": "ExecutePipeline",
 									"dependsOn": [
 										{
 											"activity": "CP_MSSQL_INCREMENTAL_FLAG_TRUE",
 											"dependencyConditions": [
-												"Succeeded"
+												"Completed"
 											]
 										}
 									],
@@ -1701,11 +1833,11 @@
 												"type": "Expression"
 											},
 											"P_ROWSCOPIED_UNIT": {
-												"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.rowsCopied",
+												"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.executionDetails[0].status, 'Failed'), '0', activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.rowsCopied)",
 												"type": "Expression"
 											},
 											"P_ROWSREAD_UNIT": {
-												"value": "@activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.rowsRead",
+												"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.executionDetails[0].status, 'Failed'), '0', activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.rowsRead)",
 												"type": "Expression"
 											},
 											"P_STATUS": {
@@ -1730,6 +1862,14 @@
 											},
 											"P_DATA_DOMAIN": {
 												"value": "@pipeline().parameters.P_DATA_DOMAIN",
+												"type": "Expression"
+											},
+											"P_CODE_ERROR": {
+												"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.executionDetails[0].status, 'Failed'), string(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.errors[0].Code), '--')\n",
+												"type": "Expression"
+											},
+											"P_MSG_ERROR": {
+												"value": "@if(equals(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.executionDetails[0].status, 'Failed'), string(activity('CP_MSSQL_INCREMENTAL_FLAG_TRUE').output.errors[0].Message), '--')\n",
 												"type": "Expression"
 											}
 										}
@@ -1895,7 +2035,7 @@
 									}
 								},
 								{
-									"name": "V_FILENAME_MSSQL_INCR_copy1",
+									"name": "V_FILENAME_MSSQL_INCR_TRUE",
 									"type": "SetVariable",
 									"dependsOn": [],
 									"policy": {
@@ -1912,7 +2052,7 @@
 									}
 								},
 								{
-									"name": "V_PATH_MSSQL_INCR_copy1",
+									"name": "V_PATH_MSSQL_INCR_TRUE",
 									"type": "SetVariable",
 									"dependsOn": [],
 									"policy": {

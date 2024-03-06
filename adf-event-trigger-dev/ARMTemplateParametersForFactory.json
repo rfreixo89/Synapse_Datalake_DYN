@@ -13,6 +13,15 @@
 		},
 		"LS_DLS_properties_typeProperties_url": {
 			"value": "@{concat('https://',\nlinkedService().P_STORAGE_ACCOUNT,\n'.dfs.core.windows.net')}"
+		},
+		"TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_PATH": {
+			"value": "@triggerBody().folderPath"
+		},
+		"TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_FILENAME": {
+			"value": "@triggerBody().fileName"
+		},
+		"TRG_EVENT_LDZ_TO_RAW_properties_typeProperties_scope": {
+			"value": "/subscriptions/2bfc44c5-aef6-403f-bd57-d339da205622/resourceGroups/DL-Event-Trigger-dev/providers/Microsoft.Storage/storageAccounts/dlseventtriggerdev"
 		}
 	}
 }

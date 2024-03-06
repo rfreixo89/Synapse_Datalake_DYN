@@ -20,6 +20,18 @@
 			"type": "string",
 			"defaultValue": "@{concat('https://',\nlinkedService().P_STORAGE_ACCOUNT,\n'.dfs.core.windows.net')}"
 		},
+		"TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_PATH": {
+			"type": "string",
+			"defaultValue": "@triggerBody().folderPath"
+		},
+		"TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_FILENAME": {
+			"type": "string",
+			"defaultValue": "@triggerBody().fileName"
+		},
+		"TRG_EVENT_LDZ_TO_RAW_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/2bfc44c5-aef6-403f-bd57-d339da205622/resourceGroups/DL-Event-Trigger-dev/providers/Microsoft.Storage/storageAccounts/dlseventtriggerdev"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -55,6 +67,15 @@
 					},
 					"LS_DLS_properties_typeProperties_url": {
 						"value": "[parameters('LS_DLS_properties_typeProperties_url')]"
+					},
+					"TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_PATH": {
+						"value": "[parameters('TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_PATH')]"
+					},
+					"TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_FILENAME": {
+						"value": "[parameters('TRG_EVENT_LDZ_TO_RAW_properties_PL_EVENT_LDZ_RAW_parameters_P_FILENAME')]"
+					},
+					"TRG_EVENT_LDZ_TO_RAW_properties_typeProperties_scope": {
+						"value": "[parameters('TRG_EVENT_LDZ_TO_RAW_properties_typeProperties_scope')]"
 					}
 				}
 			},
